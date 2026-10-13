@@ -46,8 +46,9 @@ public class MainMenu : MonoBehaviour
     
     public void OnBackClick()
     {
-        if (_menus.Count <= 0) return;
+        if (_menus.Count <= 1) return;
         _menus[^1].SetActive(false);
         _menus.RemoveAt(_menus.Count - 1);
+        _menus[^1].SetActive(true);
     }
 }
