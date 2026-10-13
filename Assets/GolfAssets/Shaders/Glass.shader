@@ -49,7 +49,7 @@ Shader "SimpleLit/Glass"
                 float4 PositionSS : TEXCOORD2;
             };
 
-            float4 _CameraOpaqueTexture_TexelSize;
+            // float4 _CameraOpaqueTexture_TexelSize;
 
             TEXTURE2D(_BaseMap);
             SAMPLER(sampler_BaseMap);
