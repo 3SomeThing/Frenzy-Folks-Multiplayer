@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Frenzy-Folks/Scenes/Startup.unity
+    guid: d92d7f12ddfcf77409d6dbed0f0a922a
+  - enabled: 1
     path: Assets/Frenzy-Folks/Scenes/MainMenu.unity
     guid: 4dfc5972a08bb8f4ebc9db380e825b3f
   m_configObjects:
