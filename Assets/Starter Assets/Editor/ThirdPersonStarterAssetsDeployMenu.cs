@@ -17,7 +17,7 @@ namespace StarterAssets
         [MenuItem(MenuRoot + "/Reset Third Person Controller Armature", false)]
         static void ResetThirdPersonControllerArmature()
         {
-            var thirdPersonControllers = FindObjectsByType<ThirdPersonController>(FindObjectsSortMode.None);
+            var thirdPersonControllers = FindObjectsByType<ThirdPersonController>();
             var player = thirdPersonControllers.FirstOrDefault(controller =>
                 controller.GetComponent<Animator>() && controller.CompareTag(PlayerTag));
 
@@ -50,7 +50,7 @@ namespace StarterAssets
         [MenuItem(MenuRoot + "/Reset Third Person Controller Capsule", false)]
         static void ResetThirdPersonControllerCapsule()
         {
-            var thirdPersonControllers = FindObjectsByType<ThirdPersonController>(FindObjectsSortMode.None);
+            var thirdPersonControllers = FindObjectsByType<ThirdPersonController>();
             var player = thirdPersonControllers.FirstOrDefault(controller =>
                 !controller.GetComponent<Animator>() && controller.CompareTag(PlayerTag));
 
@@ -80,23 +80,23 @@ namespace StarterAssets
             }
         }
 
-        static string GetThirdPersonPrefabPath()
+        private static string GetThirdPersonPrefabPath()
         {
-            if (TryLocatePrefab(PlayerArmaturePrefabName, null, new[] { typeof(ThirdPersonController), typeof(StarterAssetsInputs) }, out GameObject _, out string prefabPath))
+            if (!TryLocatePrefab(PlayerArmaturePrefabName, null,
+                    new[] { typeof(ThirdPersonController), typeof(StarterAssetsInputs) }, out GameObject _,
+                    out string prefabPath)) return null;
+            
+            StringBuilder pathString = new StringBuilder();
+            DirectoryInfo currentDirectory = new FileInfo(prefabPath).Directory;
+            while (currentDirectory != null && currentDirectory.Name != "Packages")
             {
-                var pathString = new StringBuilder();
-                var currentDirectory = new FileInfo(prefabPath).Directory;
-                while (currentDirectory.Name != "Packages")
-                {
-                    pathString.Insert(0, $"/{currentDirectory.Name}");
-                    currentDirectory = currentDirectory.Parent;
-                }
-
-                pathString.Insert(0, currentDirectory.Name);
-                return pathString.ToString();
+                pathString.Insert(0, $"/{currentDirectory.Name}");
+                currentDirectory = currentDirectory.Parent;
             }
 
-            return null;
+            if (currentDirectory != null) pathString.Insert(0, currentDirectory.Name);
+            return pathString.ToString();
+
         }
     }
 }
