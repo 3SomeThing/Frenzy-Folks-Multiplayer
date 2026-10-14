@@ -1,17 +1,15 @@
 using Frenzy_Folks.Scripts.Core.FSM;
+using Frenzy_Folks.Scripts.Traps.Turret;
 using UnityEngine;
 
-public class TurretIdleState : State
+public class TurretIdleState : TurretState
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void OnTriggerEnter(Collider other)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        Debug.Log("Attacking player!");
+        if (other.CompareTag("Player"))
+        {
+            // Attack the player
+        }
     }
 }

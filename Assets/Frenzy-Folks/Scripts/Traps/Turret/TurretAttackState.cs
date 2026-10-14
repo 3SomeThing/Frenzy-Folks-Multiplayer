@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Frenzy_Folks.Scripts.Traps.Turret
 {
-    public class TurretAttackState : State
+    public class TurretAttackState : TurretState
     {
         private void OnTriggerEnter(Collider other)
         {

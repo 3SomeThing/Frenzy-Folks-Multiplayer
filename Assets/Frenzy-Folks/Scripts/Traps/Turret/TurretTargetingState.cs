@@ -3,15 +3,8 @@ using UnityEngine;
 
 namespace Frenzy_Folks.Scripts.Traps.Turret
 {
-    public class TurretTargetingState : State
+    public class TurretTargetingState : TurretState
     {
-        private void OnTriggerEnter(Collider other)
-        {
-            Debug.Log("Attacking player!");
-            if (other.CompareTag("Player"))
-            {
-                // Attack the player
-            }
-        }
+        
     }
 }
