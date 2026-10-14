@@ -136,7 +136,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 2971780549
+  GlobalObjectIdHash: 1150902746
   InScenePlacedSourceGlobalObjectIdHash: 0
   m_InScenePlacedDisabledByDefault: 0
   DeferredDespawnTick: 0
@@ -216,7 +216,7 @@ MonoBehaviour:
   windParticles: {fileID: 4907246502511961138}
   windSound: {fileID: 2665714356455249726}
   windTrigger: {fileID: 6582669326407015013}
-  debugLogs: 1
+  debugLogs: 0
 --- !u!65 &4200875024093129046
 BoxCollider:
   m_ObjectHideFlags: 0
