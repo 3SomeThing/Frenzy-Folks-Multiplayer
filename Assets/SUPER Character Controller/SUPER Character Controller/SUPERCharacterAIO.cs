@@ -848,10 +848,33 @@ public class SUPERCharacterAIO : MonoBehaviour{
                 p_Rigidbody.AddForce(-new Vector3(p_Rigidbody.linearVelocity.x,currentGroundInfo.isInContactWithGround? p_Rigidbody.linearVelocity.y-  Physics.gravity.y:0,p_Rigidbody.linearVelocity.z)*(decelerationSpeed*Time.fixedDeltaTime),ForceMode.Force); 
             }
             //normal speed
-            else if((currentGroundInfo.isGettingGroundInfo) && currentGroundInfo.groundAngle<hardSlopeLimit && currentGroundInfo.groundAngle_Raw<hardSlopeLimit){
-                p_Rigidbody.linearVelocity = (Vector3.MoveTowards(p_Rigidbody.linearVelocity,Vector3.ClampMagnitude(((Direction)*((Speed)*Time.fixedDeltaTime))+(Vector3.down),Speed/50),1));
+            // else if((currentGroundInfo.isGettingGroundInfo) && currentGroundInfo.groundAngle<hardSlopeLimit && currentGroundInfo.groundAngle_Raw<hardSlopeLimit){
+            //     p_Rigidbody.linearVelocity = (Vector3.MoveTowards(p_Rigidbody.linearVelocity,Vector3.ClampMagnitude(((Direction)*((Speed)*Time.fixedDeltaTime))+(Vector3.down),Speed/50),1));
+            // }
+            else if ((currentGroundInfo.isGettingGroundInfo) &&
+                     currentGroundInfo.groundAngle < hardSlopeLimit &&
+                     currentGroundInfo.groundAngle_Raw < hardSlopeLimit)
+            {
+                Rigidbody groundBody = currentGroundInfo.groundFromRay.rigidbody;
+                Vector3 groundVelocity = groundBody
+                    ? groundBody.GetPointVelocity(currentGroundInfo.groundFromRay.point)
+                    : Vector3.zero;
+
+                Vector3 targetVelocity = Vector3.ClampMagnitude(
+                    (Direction * (Speed * Time.fixedDeltaTime)) + Vector3.down,
+                    Speed / 50);
+
+                Vector3 relativeVelocity = p_Rigidbody.linearVelocity - groundVelocity;
+                p_Rigidbody.linearVelocity =
+                    Vector3.MoveTowards(relativeVelocity, targetVelocity, 1) + groundVelocity;
             }
-            capsule.sharedMaterial = InputDir.magnitude>0 ? _ZeroFriction : _MaxFriction;
+            // capsule.sharedMaterial = InputDir.magnitude>0 ? _ZeroFriction : _MaxFriction;
+            Rigidbody groundRigidbody = currentGroundInfo.groundFromRay.rigidbody;
+            bool onKinematicPlatform = groundRigidbody && groundRigidbody.isKinematic;
+
+            capsule.sharedMaterial = onKinematicPlatform || InputDir.magnitude == 0
+                ? _MaxFriction
+                : _ZeroFriction;
         }
         //Sliding
         else if(isSliding){
