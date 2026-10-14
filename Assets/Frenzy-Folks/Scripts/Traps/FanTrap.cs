@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Frenzy_Folks.Scripts.Player;
+using SUPERCharacter;
 using UnityEngine;
 
 public class FanTrap : MonoBehaviour
@@ -163,7 +164,7 @@ public class FanTrap : MonoBehaviour
             return;
         }
 
-        FrenzyThirdPersonController player = other.GetComponentInParent<FrenzyThirdPersonController>();
+        SUPERCharacterAIO player = other.GetComponent<SUPERCharacterAIO>();
         if (player == null)
         {
             if (debugLogs)
@@ -173,25 +174,28 @@ public class FanTrap : MonoBehaviour
             return;
         }
 
-        if (nextPushTime.TryGetValue(player, out float nextTime) && Time.time < nextTime)
+        /*if (nextPushTime.TryGetValue(player, out float nextTime) && Time.time < nextTime)
         {
             return;
         }
 
         nextPushTime[player] = Time.time + pushInterval;
+        */
         Vector3 direction = Quaternion.AngleAxis(currentSweepAngle, transform.up) * windTrigger.transform.up;
-        direction.y = 0f;
+        direction.y = 10f;
         if (direction.sqrMagnitude < 0.001f)
         {
             return;
         }
 
         Vector3 impulse = direction.normalized * pushSpeed;
-        player.ApplyExternalImpulse(impulse);
-        if (debugLogs)
+        
+        Rigidbody rb = player.GetComponent<Rigidbody>();
+        rb.AddForce(impulse, ForceMode.Impulse);
+        /*if (debugLogs)
         {
             Debug.Log($"[FanTrap] Capsule hit player '{player.name}'; push={impulse}, sweep={currentSweepAngle:0.#}°.", player);
-        }
+        }*/
     }
 
     private void toggleParticlesAndSound(bool status)
