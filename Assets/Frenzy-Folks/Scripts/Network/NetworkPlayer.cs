@@ -1,23 +1,18 @@
 ﻿using System.Collections.Generic;
+using SUPERCharacter;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace Frenzy_Folks.Scripts.Network
+public class NetworkPlayer : NetworkBehaviour
 {
-    public class NetworkPlayer : NetworkBehaviour
+    [SerializeField] private List<GameObject> localOnlyObjects = new();
+
+    public override void OnNetworkSpawn()
     {
-        [SerializeField] private List<GameObject> localOnlyObjects;
-        
-        private void Awake()
-        {
-            Debug.Log("Player is awake");
-        }
+        if (!IsOwner) return;
 
-        public override void OnNetworkSpawn()
-        {
-            if (!IsOwner) return;
+        foreach (GameObject localOnlyObject in localOnlyObjects) localOnlyObject.SetActive(true);
 
-            foreach (GameObject localOnlyObject in localOnlyObjects) localOnlyObject.SetActive(true);
-        }
+        GetComponent<SUPERCharacterAIO>().enabled = true;
     }
 }

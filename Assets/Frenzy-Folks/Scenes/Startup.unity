@@ -128,8 +128,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 766945}
-  - component: {fileID: 766946}
+  - component: {fileID: 766947}
   - component: {fileID: 766943}
+  - component: {fileID: 766948}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -183,7 +184,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &766946
+--- !u!114 &766947
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -192,14 +193,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 766942}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 948aa7ba24e4461380f0199b5e8eebf2, type: 3}
+  m_Script: {fileID: 11500000, guid: 593a2fe42fa9d37498c96f9a383b6521, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Frenzy_Folks.Scripts.Network.FrenzyNetworkManager
-  NetworkManagerExpanded: 1
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkManager
+  NetworkManagerExpanded: 0
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 766943}
-    PlayerPrefab: {fileID: 2991034281154932462, guid: 15189617dc28beb4aa798625215dee38, type: 3}
+    PlayerPrefab: {fileID: 3443985966659846368, guid: 0dd4b46b2acdf7141b09651706d31001, type: 3}
     Prefabs:
       NetworkPrefabsLists:
       - {fileID: 11400000, guid: 775eed952b0311d44b4963a5362fb8cc, type: 2}
@@ -225,8 +226,20 @@ MonoBehaviour:
     OldPrefabList: []
   RunInBackground: 1
   LogLevel: 1
+--- !u!114 &766948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 766942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 948aa7ba24e4461380f0199b5e8eebf2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Frenzy_Folks.Scripts.Network.FrenzyNetworkManager
   gameState: {fileID: 0}
-  serverEventHandler: {fileID: 0}
+  serverEventHandlerPrefab: {fileID: 2904118224704008743, guid: 5718a6cb0511bb043a6abb2c69fdd98a, type: 3}
 --- !u!1 &997764590
 GameObject:
   m_ObjectHideFlags: 0

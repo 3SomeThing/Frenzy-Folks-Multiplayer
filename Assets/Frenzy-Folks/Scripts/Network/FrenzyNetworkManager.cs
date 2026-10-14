@@ -1,31 +1,47 @@
 ﻿using Frenzy_Folks.Scripts.Core;
+using Frenzy_Folks.Scripts.Startup;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 
-namespace Frenzy_Folks.Scripts.Network
+public class FrenzyNetworkManager : MonoBehaviour
 {
-    public class FrenzyNetworkManager : NetworkManager
+    [SerializeField] private GameState gameState;
+    [SerializeField] private ServerEventHandler serverEventHandlerPrefab;
+
+    private ServerEventHandler _serverEventHandler;
+
+    public void StartHost()
     {
-        [SerializeField] private GameState gameState;
-        [SerializeField] private ServerEventHandler serverEventHandler;
+        // We assume that we are the server, I don't see a way as it is not possible
+        _serverEventHandler = Instantiate(serverEventHandlerPrefab);
+        NetworkManager.Singleton.OnServerStarted += _serverEventHandler.OnServerStarted;
+        NetworkManager.Singleton.OnServerStopped += _serverEventHandler.OnServerStopped;
         
-        public FrenzyNetworkManager()
-        {
-            OnInstantiated += OnNetworkManageAvailable;
-        }
+        SetConnectionData("0.0.0.0", 6767);
 
-        private void OnNetworkManageAvailable(NetworkManager manager)
-        {
-            if (manager.IsServer)
-            {
-                manager.OnServerStarted += serverEventHandler.OnServerStarted;
-                manager.OnServerStopped += serverEventHandler.OnServerStopped;
-            }
-        }
+        bool success = NetworkManager.Singleton.StartHost();
 
-        public new bool StartHost()
-        {
-            return base.StartHost();
-        }
+        if (success) return;
+
+        MainMenuLoader.LoadMainMenu();
+    }
+
+    public void ConnectToServer(string ip, ushort port)
+    {
+        SetConnectionData(ip, port);
+
+        NetworkManager.Singleton.StartClient();
+    }
+
+    private void SetConnectionData(string ip, ushort port)
+    {
+        UnityTransport utp = (UnityTransport)NetworkManager.Singleton.NetworkConfig.NetworkTransport;
+        utp.SetConnectionData(ip, port);
+    }
+
+    public static FrenzyNetworkManager Get()
+    {
+        return NetworkManager.Singleton.GetComponent<FrenzyNetworkManager>();
     }
 }
