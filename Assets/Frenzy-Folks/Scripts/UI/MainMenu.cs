@@ -4,7 +4,6 @@ using UnityEngine;
 public class MainMenu : MonoBehaviour
 {
     [SerializeField] private GameObject mainMenu;
-    [SerializeField] private GameObject hostMenu;
 
     private readonly List<GameObject> _menus = new List<GameObject>();
     
@@ -19,29 +18,19 @@ public class MainMenu : MonoBehaviour
     {
         
     }
-    
-    public void OnHostClick()
-    {
-        foreach (GameObject menu in _menus) menu.SetActive(false);
-        hostMenu.SetActive(true);
-        _menus.Add(hostMenu);
-    }
-    
-    public void OnJoinClick()
-    {
-        // Code to handle joining a game
-        Debug.Log("Join button clicked");
-    }
-    
-    public void OnSettingsClick()
-    {
-        // Code to handle opening settings
-        Debug.Log("Settings button clicked");
-    }
 
     public void OnQuitClick()
     {
         Application.Quit();
+    }
+
+    public void OpenMenu(GameObject menu)
+    {
+        if (menu == null) return;
+        if (_menus.Count > 0 && _menus[^1] == menu) return;
+        _menus[^1].SetActive(false);
+        menu.SetActive(true);
+        _menus.Add(menu);
     }
     
     public void OnBackClick()
