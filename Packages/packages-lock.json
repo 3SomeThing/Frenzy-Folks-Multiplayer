@@ -17,6 +17,13 @@
       },
       "hash": "aa5fc638d623f56178d50329d9ad8c541a57fe66"
     },
+    "com.kevinbedi.springs": {
+      "version": "https://github.com/mashlol/SimpleUnitySprings.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "1b8c55e99c55c2cd0cd5f597e6f897b28514a6b0"
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,

@@ -1,34 +1,26 @@
-﻿using System.Collections.Generic;
-using Frenzy_Folks.Scripts.Player;
-using SUPERCharacter;
+﻿using SUPERCharacter;
 using UnityEngine;
 
-public class FanTrap : MonoBehaviour
+public class FanTrap : FanTrapConfiguration
 {
     [SerializeField] private ParticleSystem windParticles;
     [SerializeField] private AudioSource windSound;
     [SerializeField] private CapsuleCollider windTrigger;
-    [SerializeField, Min(0.1f)] private float blowingDuration = 7f;
-    [SerializeField, Min(0.1f)] private float pauseDuration = 2f;
-    [SerializeField, Range(0f, 90f)] private float sweepAngle = 45f;
-    [SerializeField, Min(0.1f)] private float pushInterval = 0.25f;
-    [SerializeField, Min(0f)] private float pushSpeed = 8f;
-    [SerializeField] private bool debugLogs = true;
+    [SerializeField] private bool debugLogs = false;
 
-    private readonly Dictionary<FrenzyThirdPersonController, float> nextPushTime =
-        new Dictionary<FrenzyThirdPersonController, float>();
     private Quaternion initialHeadRotation;
     private float cycleStartTime;
     private float currentSweepAngle;
-    private int playerLayer;
+    private int playerLayer; //TODO: Generique partout
     private bool wasBlowing;
 
     private void Awake()
     {
-        playerLayer = LayerMask.NameToLayer("Player");
+        playerLayer = LayerMask.NameToLayer("Player"); //TODO: Generique partout
         if (playerLayer < 0)
         {
-            Debug.LogError("[FanTrap] Unity layer 'Player' does not exist. Add it in Project Settings > Tags and Layers.", this);
+            Debug.LogError(
+                "[FanTrap] Unity layer 'Player' does not exist. Add it in Project Settings > Tags and Layers.", this);
             enabled = false;
             return;
         }
@@ -45,11 +37,11 @@ public class FanTrap : MonoBehaviour
             {
                 Debug.LogError($"[FanTrap] No wind ParticleSystem assigned or found under '{name}'.", this);
             }
-            
+
             enabled = false;
             return;
         }
-        
+
         if (windTrigger == null)
         {
             windTrigger = GetComponentInChildren<CapsuleCollider>(true);
@@ -66,19 +58,16 @@ public class FanTrap : MonoBehaviour
             return;
         }
 
-        Rigidbody body = GetComponent<Rigidbody>();
-        body.isKinematic = true;
-        body.useGravity = false;
-
         initialHeadRotation = transform.rotation;
-        ParticleSystem.MainModule windMain = windParticles.main;
         toggleParticlesAndSound(true);
         wasBlowing = false;
         cycleStartTime = Time.time;
-        
+
         if (debugLogs)
         {
-            Debug.Log($"[FanTrap] Ready: trigger='{windTrigger.name}', wind emitter='{windParticles.name}' at local position {windParticles.transform.localPosition}; particle simulation={windParticles.main.simulationSpace}.", this);
+            Debug.Log(
+                $"[FanTrap] Ready: trigger='{windTrigger.name}', wind emitter='{windParticles.name}' at local position {windParticles.transform.localPosition}; particle simulation={windParticles.main.simulationSpace}.",
+                this);
         }
     }
 
@@ -91,20 +80,15 @@ public class FanTrap : MonoBehaviour
         if (isBlowing != wasBlowing)
         {
             wasBlowing = isBlowing;
-            if (isBlowing)
+            toggleParticlesAndSound(isBlowing);
+
+            if (debugLogs)
             {
-                toggleParticlesAndSound(true);
-                
-                if (debugLogs)
+                if (isBlowing)
                 {
                     Debug.Log($"[FanTrap] Wind ON; sweeping from {-sweepAngle:0.#}° to {sweepAngle:0.#}°.", this);
                 }
-            }
-            else
-            {
-                toggleParticlesAndSound(false);
-                
-                if (debugLogs)
+                else
                 {
                     Debug.Log("[FanTrap] Wind OFF.", this);
                 }
@@ -124,7 +108,6 @@ public class FanTrap : MonoBehaviour
     {
         blowingDuration = Mathf.Max(0.1f, blowingDuration);
         pauseDuration = Mathf.Max(0.1f, pauseDuration);
-        pushInterval = Mathf.Max(0.1f, pushInterval);
         pushSpeed = Mathf.Max(0f, pushSpeed);
     }
 
@@ -138,51 +121,30 @@ public class FanTrap : MonoBehaviour
         TryPushPlayer(other);
     }
 
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.gameObject.layer != playerLayer)
-        {
-            return;
-        }
-
-        FrenzyThirdPersonController player = other.GetComponentInParent<FrenzyThirdPersonController>();
-        if (player != null)
-        {
-            nextPushTime.Remove(player);
-        }
-    }
-
     private void TryPushPlayer(Collider other)
     {
-        if (other.gameObject.layer != playerLayer)
-        {
-            return;
-        }
-
         if (!wasBlowing)
         {
             return;
         }
 
-        SUPERCharacterAIO player = other.GetComponent<SUPERCharacterAIO>();
+        SUPERCharacterAIO player = other.GetComponentInParent<SUPERCharacterAIO>();
         if (player == null)
         {
             if (debugLogs)
             {
-                Debug.Log($"[FanTrap] Capsule touched '{other.name}', but no FrenzyThirdPersonController was found in its parents.", this);
+                Debug.Log($"[FanTrap] Capsule touched '{other.name}', but no SUPERCharacterAIO was found in its parents.", this);
             }
             return;
         }
 
-        /*if (nextPushTime.TryGetValue(player, out float nextTime) && Time.time < nextTime)
+        if (player.gameObject.layer != playerLayer)
         {
             return;
         }
 
-        nextPushTime[player] = Time.time + pushInterval;
-        */
         Vector3 direction = Quaternion.AngleAxis(currentSweepAngle, transform.up) * windTrigger.transform.up;
-        direction.y = 10f;
+        direction.y = 0f;
         if (direction.sqrMagnitude < 0.001f)
         {
             return;
@@ -191,11 +153,27 @@ public class FanTrap : MonoBehaviour
         Vector3 impulse = direction.normalized * pushSpeed;
         
         Rigidbody rb = player.GetComponent<Rigidbody>();
-        rb.AddForce(impulse, ForceMode.Impulse);
-        /*if (debugLogs)
+        if (rb == null)
+        {
+            Debug.LogError($"[FanTrap] Player '{player.name}' has no Rigidbody for wind force.", player);
+            return;
+        }
+
+        if (rb.isKinematic)
+        {
+            if (debugLogs)
+            {
+                Debug.LogWarning($"[FanTrap] Player '{player.name}' has a kinematic Rigidbody; AddForce will not affect it.", player);
+            }
+
+            return;
+        }
+
+        rb.AddForce(impulse, ForceMode.Force);
+        if (debugLogs)
         {
             Debug.Log($"[FanTrap] Capsule hit player '{player.name}'; push={impulse}, sweep={currentSweepAngle:0.#}°.", player);
-        }*/
+        }
     }
 
     private void toggleParticlesAndSound(bool status)
