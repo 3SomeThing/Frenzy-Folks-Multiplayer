@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class MainMenu : MonoBehaviour
@@ -21,7 +22,14 @@ public class MainMenu : MonoBehaviour
 
     public void OnQuitClick()
     {
-        Application.Quit();
+        if (EditorApplication.isPlaying)
+        {
+            EditorApplication.isPlaying = false;
+        }
+        else
+        {
+            Application.Quit();
+        }
     }
 
     public void OpenMenu(GameObject menu)
