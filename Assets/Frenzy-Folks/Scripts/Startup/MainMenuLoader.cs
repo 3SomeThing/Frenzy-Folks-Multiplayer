@@ -8,7 +8,7 @@ namespace Frenzy_Folks.Scripts.Startup
         private void Awake()
         {
             SceneManager.LoadScene("MainMenu");
-            PlayerInfos.Singleton.Load();
+            UserSettings.Singleton.Load();
         }
     }
 }
