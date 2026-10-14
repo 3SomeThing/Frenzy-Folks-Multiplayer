@@ -5,29 +5,33 @@ using UnityEngine;
 namespace Frenzy_Folks.Scripts.Startup
 {
     [Serializable]
-    public class PlayerInfos
+    public class UserSettings
     {
-        public static PlayerInfos Singleton = new PlayerInfos();
+        public static UserSettings Singleton = new UserSettings();
         
         // Player informations
         public string LastPlayerName = "";
         
         // Network specifics
         public string LastIP = "";
-        public string LastPort = "";
+        public int LastPort = -1;
 
         private static string SavePath =>
-            Path.Combine(Application.persistentDataPath, "player-infos.json");
-        
-        private PlayerInfos() {}
+            Path.Combine(Application.persistentDataPath, "user-settings.json");
+
+        private UserSettings()
+        {
+            Load();
+        }
 
         public void Save()
         {
             File.WriteAllText(SavePath, JsonUtility.ToJson(this, true));
         }
 
-        public PlayerInfos Load()
+        public UserSettings Load()
         {
+            Debug.Log(SavePath);
             if(File.Exists(SavePath)) JsonUtility.FromJsonOverwrite(File.ReadAllText(SavePath), this);
             return this;
         }
