@@ -861,7 +861,10 @@ public class SUPERCharacterAIO : MonoBehaviour{
         //Air Control
         else if(!currentGroundInfo.isGettingGroundInfo){
             p_Rigidbody.AddForce((((Direction*(walkingSpeed))*Time.fixedDeltaTime)*airControlFactor*5)*currentGroundInfo.groundAngleMultiplier_Inverse_persistent,ForceMode.Acceleration);
-            p_Rigidbody.linearVelocity= Vector3.ClampMagnitude((Vector3.right*p_Rigidbody.linearVelocity.x + Vector3.forward*p_Rigidbody.linearVelocity.z) ,(walkingSpeed/50))+(Vector3.up*p_Rigidbody.linearVelocity.y);
+            
+            // UNCOMMENT BELOW TO REMOVE SPEED LIMIT WHEN NOT TOUCHING GROUND
+            // p_Rigidbody.linearVelocity= Vector3.ClampMagnitude((Vector3.right*p_Rigidbody.linearVelocity.x + Vector3.forward*p_Rigidbody.linearVelocity.z) ,(walkingSpeed/50))+(Vector3.up*p_Rigidbody.linearVelocity.y);
+            
             if(!currentGroundInfo.potentialStair && jumpEnhancements){
                 if(p_Rigidbody.linearVelocity.y < 0 && p_Rigidbody.linearVelocity.y> Physics.gravity.y*1.5f){
                     p_Rigidbody.linearVelocity += Vector3.up*(Physics.gravity.y*(decentMultiplier)*Time.fixedDeltaTime);

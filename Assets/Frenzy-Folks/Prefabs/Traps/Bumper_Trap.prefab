@@ -111,7 +111,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: df5aa4522b2b4504180556ca8b0285b8, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.4
+  m_Volume: 1
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -210,7 +210,7 @@ MonoBehaviour:
   pushSpeedHorizontal: 30
   pushSpeedVertical: 3
   bumperSound: {fileID: 6454008462608993977}
-  debugLogs: 1
+  debugLogs: 0
   bumpScale: 1.25
   animationSpeed: 5
 --- !u!114 &2116127848516281157
@@ -225,7 +225,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 3956886708
+  GlobalObjectIdHash: 2449053353
   InScenePlacedSourceGlobalObjectIdHash: 0
   m_InScenePlacedDisabledByDefault: 0
   DeferredDespawnTick: 0
