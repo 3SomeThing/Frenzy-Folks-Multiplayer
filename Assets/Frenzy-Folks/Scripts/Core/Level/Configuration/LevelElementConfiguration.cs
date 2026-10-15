@@ -9,9 +9,10 @@ public abstract class LevelElementConfiguration<TLevelElement, TConfiguration>
     public abstract void Apply(TLevelElement target);
     public abstract TConfiguration From(TLevelElement source);
 
-    public sealed override void Apply(GameObject target)
+    public sealed override GameObject Apply(GameObject target)
     {
         Apply(GetLevelElement(target));
+        return target;
     }
 
     public sealed override BaseConfigurationSerializable From(GameObject source)

@@ -21,23 +21,27 @@ public class ServerEventHandler : MonoBehaviour
         DontDestroyOnLoad(this);
         _networkManager = NetworkManager.Singleton;
         _networkManager.ConnectionApprovalCallback += CheckApprovalCallback;
-        // _networkManager.OnClientConnectedCallback += OnClientJoin;
+        _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
+    }
+
+    private void OnClientDisconnect(ulong obj)
+    {
+        
     }
 
     public void OnServerStarted()
     {
         _networkManager.SceneManager.OnLoadEventCompleted += OnSceneLoadedComplete;
-        
-        _networkManager.SceneManager.LoadScene("Lobby", LoadSceneMode.Single);
+        _networkManager.SceneManager.LoadScene("Level", LoadSceneMode.Single);
     }
 
     private void CheckApprovalCallback(
         NetworkManager.ConnectionApprovalRequest request,
         NetworkManager.ConnectionApprovalResponse response)
     {
-        int currentPlayers = _networkManager.ConnectedClientsIds.Count;
+        _currentPlayerCount = _networkManager.ConnectedClientsIds.Count;
 
-        bool isThereTooManyPlayer = currentPlayers >= 3;
+        bool isThereTooManyPlayer = _currentPlayerCount >= 3;
 
         if (isThereTooManyPlayer)
         {
@@ -67,11 +71,6 @@ public class ServerEventHandler : MonoBehaviour
     {
         Debug.Log($"Server: {sceneName} loaded");
     }
-
-    // private void OnClientJoin(ulong clientId)
-    // {
-    //     _networkManager.ConnectedClients[clientId].PlayerObject.transform.position = GetRandomPosInLobby();
-    // }
 
     public void OnServerStopped(bool isHost)
     {

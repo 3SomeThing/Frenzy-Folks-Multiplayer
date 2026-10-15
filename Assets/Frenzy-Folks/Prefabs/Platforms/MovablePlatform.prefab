@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 6377335392225742986}
   - component: {fileID: 2389736061813145300}
   - component: {fileID: 8113825014362676194}
+  - component: {fileID: 8578098570222629402}
   m_Layer: 0
   m_Name: MovablePlatform
   m_TagString: Untagged
@@ -153,4 +154,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e5e31521d9849e7aa511585395696b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MovableTrap
-  speed: 2
+  speed: 5
+  pauseDuration: 1
+--- !u!114 &8578098570222629402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7454710114694620191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 1984942434
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  m_InScenePlacedDisabledByDefault: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  m_InScenePlaced: 0
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0

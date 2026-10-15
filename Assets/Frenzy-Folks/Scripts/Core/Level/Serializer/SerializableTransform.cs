@@ -24,4 +24,9 @@ public class SerializableTransform : IApplicable<Transform, SerializableTransfor
             scale = obj.localScale
         };
     }
+
+    public override string ToString()
+    {
+        return $"pos: {position.ToString()} - rotation: {rotation.ToString()} - scale: {scale.ToString()}";
+    }
 }

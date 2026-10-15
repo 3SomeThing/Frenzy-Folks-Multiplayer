@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MovablePlatform : MonoBehaviour
 {
-    [SerializeField] private float speed = 2F;
+    [SerializeField] private float speed = 5F;
     [SerializeField] private float pauseDuration = 1F;
     
     private List<Vector3> pathPoints = new List<Vector3>()

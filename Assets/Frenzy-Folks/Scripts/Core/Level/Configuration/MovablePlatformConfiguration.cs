@@ -6,17 +6,13 @@ using UnityEngine.Serialization;
 [Serializable]
 public class MovablePlatformConfiguration : LevelElementConfiguration<MovablePlatform, MovablePlatformConfiguration>
 {
-    [SerializeField]
-    private List<Vector3> pathPoints = new List<Vector3>()
-    {
-        new Vector3(1, 1, 1),
-        new Vector3(2, 2, 2),
-        new Vector3(3, 3, 3)
-    };
+    [SerializeField] private float speed = 5F;
+    [SerializeField] private List<Vector3> pathPoints = new List<Vector3>();
 
     public override void Apply(MovablePlatform target)
     {
-        Debug.Log("Works");
+        transform.Apply(target.transform);
+        target.SetPathPoints(pathPoints);
     }
 
     public override MovablePlatformConfiguration From(MovablePlatform source)
