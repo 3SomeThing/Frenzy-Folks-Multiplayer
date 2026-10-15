@@ -339,10 +339,10 @@ PrefabInstance:
       addedObject: {fileID: 4796468439944457181}
     - targetCorrespondingSourceObject: {fileID: 4011650199783796442, guid: 8290bc46be1825d49932e2492480426b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 8788271248861140507}
+      addedObject: {fileID: 1697686418009933519}
     - targetCorrespondingSourceObject: {fileID: 4011650199783796442, guid: 8290bc46be1825d49932e2492480426b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 67900285076042537}
+      addedObject: {fileID: 7521645290492059756}
     - targetCorrespondingSourceObject: {fileID: 4011650200241831709, guid: 8290bc46be1825d49932e2492480426b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6178347544417920335}
@@ -455,7 +455,7 @@ MonoBehaviour:
   - {fileID: 3443985966346653991}
   - {fileID: 1655421244789135373}
   - {fileID: 1655421244789135373}
---- !u!114 &8788271248861140507
+--- !u!114 &1697686418009933519
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -464,49 +464,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 3443985966659846368}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Script: {fileID: 11500000, guid: 02ea9274bf9d43e4491f697714744c0f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkAnimator
-  ShowTopMostFoldoutHeaderGroup: 1
-  NetworkAnimatorExpanded: 0
-  AuthorityMode: 0
-  m_Animator: {fileID: 1758444991707774959}
-  TransitionStateInfoList: []
-  AnimatorParameterEntries:
-    ParameterEntries:
-    - name: Vel
-      NameHash: -872531583
-      Synchronize: 1
-      ParameterType: 1
-    - name: Idle
-      NameHash: 2081823275
-      Synchronize: 1
-      ParameterType: 4
-    - name: Sliding
-      NameHash: -1078995872
-      Synchronize: 1
-      ParameterType: 4
-    - name: Grounded
-      NameHash: 862969536
-      Synchronize: 1
-      ParameterType: 4
-    - name: Sprinting
-      NameHash: -126100601
-      Synchronize: 1
-      ParameterType: 4
-  AnimatorParametersExpanded: 0
---- !u!114 &67900285076042537
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3443985966659846368}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkTransform
+  m_EditorClassIdentifier: Assembly-CSharp::ClientNetworkTransform
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkTransformExpanded: 0
   AutoOwnerAuthorityTickOffset: 1
@@ -541,3 +501,43 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &7521645290492059756
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3443985966659846368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 584b64bfda8c4946b3883c7958bc68ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ClientNetworkAnimator
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkAnimatorExpanded: 0
+  AuthorityMode: 0
+  m_Animator: {fileID: 1758444991707774959}
+  TransitionStateInfoList: []
+  AnimatorParameterEntries:
+    ParameterEntries:
+    - name: Vel
+      NameHash: -872531583
+      Synchronize: 1
+      ParameterType: 1
+    - name: Idle
+      NameHash: 2081823275
+      Synchronize: 1
+      ParameterType: 4
+    - name: Sliding
+      NameHash: -1078995872
+      Synchronize: 1
+      ParameterType: 4
+    - name: Grounded
+      NameHash: 862969536
+      Synchronize: 1
+      ParameterType: 4
+    - name: Sprinting
+      NameHash: -126100601
+      Synchronize: 1
+      ParameterType: 4
+  AnimatorParametersExpanded: 0

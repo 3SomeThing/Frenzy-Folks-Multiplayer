@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿
+
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,7 +10,7 @@ public class ServerEventHandler : MonoBehaviour
     private NetworkManager _networkManager;
 
     private int _currentPlayerCount;
-    private List<ulong> _approvedClients;
+    private List<ulong> _approvedClients = new();
 
     /**
      * This class will be only instantiate by the server (the host).
@@ -19,7 +21,7 @@ public class ServerEventHandler : MonoBehaviour
         DontDestroyOnLoad(this);
         _networkManager = NetworkManager.Singleton;
         _networkManager.ConnectionApprovalCallback += CheckApprovalCallback;
-        _networkManager.OnClientConnectedCallback += OnClientJoin;
+        // _networkManager.OnClientConnectedCallback += OnClientJoin;
     }
 
     public void OnServerStarted()
@@ -47,10 +49,10 @@ public class ServerEventHandler : MonoBehaviour
 
         response.Approved = true;
         response.CreatePlayerObject = true;
+        response.Position = GetRandomPosInLobby();
 
         _currentPlayerCount++;
         _approvedClients.Add(request.ClientNetworkId);
-        response.Position = GetRandomPosInLobby();
     }
 
     private Vector3 GetRandomPosInLobby()
@@ -66,10 +68,10 @@ public class ServerEventHandler : MonoBehaviour
         Debug.Log($"Server: {sceneName} loaded");
     }
 
-    private void OnClientJoin(ulong clientId)
-    {
-        _networkManager.ConnectedClients[clientId].PlayerObject.transform.position = GetRandomPosInLobby();
-    }
+    // private void OnClientJoin(ulong clientId)
+    // {
+    //     _networkManager.ConnectedClients[clientId].PlayerObject.transform.position = GetRandomPosInLobby();
+    // }
 
     public void OnServerStopped(bool isHost)
     {

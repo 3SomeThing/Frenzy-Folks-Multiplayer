@@ -21,7 +21,7 @@ public class FrenzyLevel : MonoBehaviour
         string name = "movable_platform";
         GameObject go = levelPrefabs[name];
         MovablePlatformConfiguration configuration = (MovablePlatformConfiguration)configurations[name];
-        configuration.Apply(go);
+        configuration.Apply(go);    
 
         Debug.Log(JsonUtility.ToJson(configuration));
     }
