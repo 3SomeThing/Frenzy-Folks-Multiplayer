@@ -71,6 +71,7 @@ public class SUPERCharacterAIO : MonoBehaviour{
     
     //Both
     Vector2 MouseXY;
+    Vector2 pendingMouseXY;
     Vector2 viewRotVelRef;
     bool isInFirstPerson, isInThirdPerson, perspecTog;
     bool setInitialRot = true;
@@ -474,6 +475,7 @@ public class SUPERCharacterAIO : MonoBehaviour{
             #endif
             MovInput = Vector2.up *Input.GetAxisRaw("Vertical") + Vector2.right * Input.GetAxisRaw("Horizontal");
         #endif
+            pendingMouseXY += MouseXY;
         #endregion
 
         #region Camera
@@ -592,7 +594,8 @@ public class SUPERCharacterAIO : MonoBehaviour{
             #endregion
 
             #region Camera
-            RotateView(MouseXY, Sensitivity, rotationWeight);
+            RotateView(pendingMouseXY, Sensitivity, rotationWeight);
+            pendingMouseXY = Vector2.zero;
              if(cameraPerspective == PerspectiveModes._3rdPerson){
                 UpdateBodyRotation_3rdPerson();
                 UpdateCameraPosition_3rdPerson();
@@ -883,10 +886,13 @@ public class SUPERCharacterAIO : MonoBehaviour{
         
         //Air Control
         else if(!currentGroundInfo.isGettingGroundInfo){
-            p_Rigidbody.AddForce((((Direction*(walkingSpeed))*Time.fixedDeltaTime)*airControlFactor*5)*currentGroundInfo.groundAngleMultiplier_Inverse_persistent,ForceMode.Acceleration);
-            
-            // UNCOMMENT BELOW TO REMOVE SPEED LIMIT WHEN NOT TOUCHING GROUND
-            // p_Rigidbody.linearVelocity= Vector3.ClampMagnitude((Vector3.right*p_Rigidbody.linearVelocity.x + Vector3.forward*p_Rigidbody.linearVelocity.z) ,(walkingSpeed/50))+(Vector3.up*p_Rigidbody.linearVelocity.y);
+            Vector3 horizontalVelocity = Vector3.ProjectOnPlane(p_Rigidbody.linearVelocity, Vector3.up);
+            Vector3 airControlVelocityChange = Vector3.ProjectOnPlane(Direction, Vector3.up)
+                * walkingSpeed * Time.fixedDeltaTime * airControlFactor * 5
+                * currentGroundInfo.groundAngleMultiplier_Inverse_persistent * Time.fixedDeltaTime;
+            float maxAirSpeed = Mathf.Max(horizontalVelocity.magnitude, walkingSpeed / 50);
+            horizontalVelocity = Vector3.ClampMagnitude(horizontalVelocity + airControlVelocityChange, maxAirSpeed);
+            p_Rigidbody.linearVelocity = horizontalVelocity + Vector3.up * p_Rigidbody.linearVelocity.y;
             
             if(!currentGroundInfo.potentialStair && jumpEnhancements){
                 if(p_Rigidbody.linearVelocity.y < 0 && p_Rigidbody.linearVelocity.y> Physics.gravity.y*1.5f){
@@ -897,7 +903,6 @@ public class SUPERCharacterAIO : MonoBehaviour{
             }
         }
 
-        
     }
     void Jump(float Force){
         if((currentGroundInfo.isInContactWithGround) && 

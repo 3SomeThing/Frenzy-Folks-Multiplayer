@@ -135,6 +135,10 @@ PrefabInstance:
       propertyPath: walkingSpeed
       value: 200
       objectReference: {fileID: 0}
+    - target: {fileID: 3443985966659846370, guid: 0dd4b46b2acdf7141b09651706d31001, type: 3}
+      propertyPath: jumpEnhancements
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3443985966659846371, guid: 0dd4b46b2acdf7141b09651706d31001, type: 3}
       propertyPath: m_LocalPosition.x
       value: 14.62
@@ -295,7 +299,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 100, y: 1, z: 100}
+  m_LocalScale: {x: 3000, y: 1, z: 3000}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -497,10 +501,6 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3928100047021615022, guid: ca4dcd90535833e4b9c1b504a4949942, type: 3}
-      propertyPath: pushSpeed
-      value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 3928100047021615022, guid: ca4dcd90535833e4b9c1b504a4949942, type: 3}
       propertyPath: sweepAngle
       value: 0
       objectReference: {fileID: 0}
@@ -620,10 +620,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4417834398645094042, guid: 36cfc372d2968aa4aad7054f07bb3a91, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6429222319333883154, guid: 36cfc372d2968aa4aad7054f07bb3a91, type: 3}
-      propertyPath: debugLogs
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -842,10 +838,6 @@ PrefabInstance:
     - target: {fileID: 1492757247803485592, guid: ca4dcd90535833e4b9c1b504a4949942, type: 3}
       propertyPath: m_IsActive
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3928100047021615022, guid: ca4dcd90535833e4b9c1b504a4949942, type: 3}
-      propertyPath: pushSpeed
-      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 3928100047021615022, guid: ca4dcd90535833e4b9c1b504a4949942, type: 3}
       propertyPath: sweepAngle
