@@ -1,12 +1,41 @@
 using System;
 using System.Collections.Generic;
 using Frenzy_Folks.Scripts.Core.FSM;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Frenzy_Folks.Scripts.Traps.Turret
 {
     public class TurretFSM : FSM
     {
+        [SerializeField] public Transform turretHead;
+        
+        [Header("Idle")]
+        [SerializeField, Range(0f, 360f)] private float sweepAngle = 45f;
+        public float SweepAngle => sweepAngle;
+        
+        [SerializeField, Min(0f)] private float sweepSpeed = 1f;
+        public float SweepSpeed => sweepSpeed;
+
+        [SerializeField, Min(0f)] private float returnToIdleDuration = 0.5f;
+        public float ReturnToIdleDuration => returnToIdleDuration;
+
+        [Header("Targeting")]
+        [SerializeField, Range(0f, 360f)] 
+        private float detectionRadius = 10f;
+        
+        [SerializeField] private SphereCollider detectionCollider;
+        
+        [SerializeField, Min(0f)]
+        private int targetingSpeed = 5;
+        public int TargetingSpeed => targetingSpeed;
+        
+        [SerializeField, Range(0f, 360f)]
+        private float lockTolerance = 5f;
+        public float LockTolerance => lockTolerance;
+        
+        [HideInInspector] public Transform targetTransform;
         
         protected override void Start()
         {
@@ -24,7 +53,6 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
                 States.TryGetValue(CurrentState, out var state) &&
                 state is TurretState turretState)
             {
-                Debug.Log("Attacking player!");
                 turretState.OnTargetEntered(other);
             }
         }
@@ -35,9 +63,26 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
                 States.TryGetValue(CurrentState, out var state) &&
                 state is TurretState turretState)
             {
-                Debug.Log("Player left!");
                 turretState.OnTargetLeft(other);
             }
+        }
+        
+        void OnValidate()
+        {
+            if (detectionCollider != null)
+                detectionCollider.radius = detectionRadius;
+        }
+        
+        void OnDrawGizmosSelected()
+        {
+            // Arc starts at the left edge and sweeps clockwise
+            Vector3 from = Quaternion.Euler(0, -sweepAngle / 2f, 0) * transform.forward;
+
+            Handles.color = new Color(1f, 0.3f, 0.2f, 0.2f);
+            Handles.DrawSolidArc(transform.position, Vector3.up, from, sweepAngle, detectionRadius);
+
+            Handles.color = Color.red;
+            Handles.DrawWireArc(transform.position, Vector3.up, from, sweepAngle, detectionRadius);
         }
     }
 }
