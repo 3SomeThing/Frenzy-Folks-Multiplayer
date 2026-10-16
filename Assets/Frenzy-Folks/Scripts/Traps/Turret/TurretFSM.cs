@@ -44,6 +44,19 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
         private float lockTolerance = 5f;
         public float LockTolerance => lockTolerance;
         
+        [Header("Attack")]
+        [SerializeField]
+        private GameObject projectilePrefab;
+        public GameObject ProjectilePrefab => projectilePrefab;
+
+        [SerializeField] 
+        private Transform firePoint;
+        public Transform FirePoint => firePoint;
+
+        [SerializeField] 
+        private float projectileForce;
+        public float ProjectileForce => projectileForce;
+        
         [HideInInspector] public Transform targetTransform;
         
         protected override void Start()

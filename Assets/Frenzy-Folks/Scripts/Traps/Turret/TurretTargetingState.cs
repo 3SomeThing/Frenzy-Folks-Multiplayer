@@ -25,7 +25,7 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
             bool isLockedOn = Vector3.Angle(Fsm.turretHead.transform.forward, direction) <= Fsm.LockTolerance;
             if (isLockedOn)
             {
-                /*Fsm.TransitionTo("Attack");*/
+                Fsm.TransitionTo("Attack");
             }
         }
 
@@ -33,11 +33,6 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
         {
             base.OnTargetLeft(other);
             Fsm.TransitionTo("Idle");
-        }
-
-        public override void Exit()
-        {
-            base.Exit();
         }
     }
 }

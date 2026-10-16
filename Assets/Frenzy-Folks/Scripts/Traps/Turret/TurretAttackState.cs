@@ -5,13 +5,29 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
 {
     public class TurretAttackState : TurretState
     {
-        private void OnTriggerEnter(Collider other)
+        public override void Enter()
         {
-            Debug.Log("Attacking player!");
-            if (other.CompareTag("Player"))
+            base.Enter();
+
+            Vector3 direction = Fsm.targetTransform.position - Fsm.FirePoint.position;
+            if (direction.sqrMagnitude < 0.001f)
             {
-                // Attack the player
+                Debug.LogError("[TurretAttackState] Cannot fire: target is too close to the fire point.", Fsm);
+                return;
             }
+
+            GameObject projectile = Object.Instantiate(Fsm.ProjectilePrefab, Fsm.FirePoint.position, Fsm.turretHead.localRotation );
+            Rigidbody projectileRigidbody = projectile.GetComponent<Rigidbody>();
+            if (projectileRigidbody == null)
+            {
+                Debug.LogError($"[TurretAttackState] Projectile '{projectile.name}' has no Rigidbody.", projectile);
+                Object.Destroy(projectile);
+                return;
+            }
+
+            projectileRigidbody.AddForce(direction.normalized * Fsm.ProjectileForce, ForceMode.Impulse);
+            
+            Fsm.TransitionTo("Targeting");
         }
     }
 }
