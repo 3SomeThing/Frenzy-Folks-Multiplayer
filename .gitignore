@@ -1,6 +1,9 @@
 ﻿# Jetbrains folder
 .idea
 
+# External builds folder
+extBuild
+
 ### Unity ###
 # This .gitignore file should be placed at the root of your Unity project directory
 #

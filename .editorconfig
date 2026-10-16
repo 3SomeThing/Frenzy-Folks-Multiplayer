@@ -1,0 +1,3 @@
+﻿[*.cs]
+dotnet_diagnostic.UAC1002.severity = silent
+namespa

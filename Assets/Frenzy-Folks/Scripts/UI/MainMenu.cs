@@ -15,14 +15,15 @@ public class MainMenu : MonoBehaviour
 
     public void OnQuitClick()
     {
-        if (EditorApplication.isPlaying)
-        {
-            EditorApplication.isPlaying = false;
-        }
-        else
-        {
-            Application.Quit();
-        }
+        // if (EditorApplication.isPlaying)
+        // {
+        //     EditorApplication.isPlaying = false;
+        // }
+        // else
+        // {
+        //     Application.Quit();
+        // }
+        Application.Quit();
     }
 
     public void OpenMenu(GameObject menu)
