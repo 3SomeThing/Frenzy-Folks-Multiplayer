@@ -1,14 +1,15 @@
 ﻿using System;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace Frenzy_Folks.Scripts.Traps.Turret
 {
-    public class TurretProjectile : MonoBehaviour
+    public class TurretProjectile : NetworkBehaviour
     {
         public float lifetime = 2f;
 
-        public float pushForce = 50f;
+        public NetworkVariable<float> pushForce = new NetworkVariable<float>(50f);
 
         private void Update()
         {
@@ -21,7 +22,7 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
         {
             if (other.gameObject.CompareTag("Player"))
             {
-                other.gameObject.GetComponent<Rigidbody>().AddForce(gameObject.transform.forward * pushForce, ForceMode.Impulse);    
+                other.gameObject.GetComponent<Rigidbody>().AddForce(gameObject.transform.forward * pushForce.Value, ForceMode.Impulse);    
                 Destroy(gameObject);
             }
         }

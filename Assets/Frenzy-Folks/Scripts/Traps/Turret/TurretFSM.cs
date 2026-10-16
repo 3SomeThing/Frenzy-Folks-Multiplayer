@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Frenzy_Folks.Scripts.Core.FSM;
+using Unity.Netcode;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -58,8 +59,8 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
         public float ProjectileSpeed => projectileSpeed;
 
         [SerializeField] 
-        private float projectileForce = 50f;
-        public float ProjectileForce => projectileForce;
+        private NetworkVariable<float> projectileForce = new NetworkVariable<float>(50f);
+        public NetworkVariable<float> ProjectileForce => projectileForce;
 
         [SerializeField, Tooltip("Number of projectile fired every second")] 
         private float fireRate = 1f;
@@ -112,6 +113,8 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
         
         void OnDrawGizmosSelected()
         {
+            
+#if UNITY_EDITOR
             // Arc starts at the left edge and sweeps clockwise
             Vector3 from = Quaternion.Euler(0, -sweepAngle / 2f, 0) * transform.forward;
 
@@ -120,6 +123,7 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
 
             Handles.color = Color.red;
             Handles.DrawWireArc(transform.position, Vector3.up, from, sweepAngle, detectionRadius);
+#endif
         }
     }
 }

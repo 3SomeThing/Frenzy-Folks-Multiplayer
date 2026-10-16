@@ -1,4 +1,5 @@
 using Frenzy_Folks.Scripts.Core.FSM;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Frenzy_Folks.Scripts.Traps.Turret
