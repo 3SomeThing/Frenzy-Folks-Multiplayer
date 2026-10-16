@@ -24,6 +24,15 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
         [Header("Targeting")]
         [SerializeField, Range(0f, 360f)] 
         private float detectionRadius = 10f;
+        public float DetectionRadius
+        {
+            get => detectionRadius;
+            set
+            {
+                detectionRadius = value;
+                ApplyRadius();
+            }
+        }
         
         [SerializeField] private SphereCollider detectionCollider;
         
@@ -44,6 +53,14 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
             States.Add("Attack", new TurretAttackState());
             CurrentState = "Idle";
             base.Start();
+        }
+        
+        void Awake() => ApplyRadius();
+
+        void ApplyRadius()
+        {
+            if (detectionCollider != null)
+                detectionCollider.radius = detectionRadius;
         }
         
         
@@ -69,8 +86,7 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
         
         void OnValidate()
         {
-            if (detectionCollider != null)
-                detectionCollider.radius = detectionRadius;
+            ApplyRadius();
         }
         
         void OnDrawGizmosSelected()
