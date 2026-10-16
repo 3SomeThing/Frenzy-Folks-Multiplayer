@@ -54,8 +54,16 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
         public Transform FirePoint => firePoint;
 
         [SerializeField] 
-        private float projectileForce;
+        private float projectileSpeed = 10f;
+        public float ProjectileSpeed => projectileSpeed;
+
+        [SerializeField] 
+        private float projectileForce = 50f;
         public float ProjectileForce => projectileForce;
+
+        [SerializeField, Tooltip("Number of projectile fired every second")] 
+        private float fireRate = 1f;
+        public float FireRate => fireRate;
         
         [HideInInspector] public Transform targetTransform;
         

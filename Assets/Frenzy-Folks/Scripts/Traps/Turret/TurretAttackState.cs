@@ -5,27 +5,35 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
 {
     public class TurretAttackState : TurretState
     {
+        private float _fireTime;
         public override void Enter()
         {
             base.Enter();
+            
+            _fireTime += Time.deltaTime;
 
             Vector3 direction = Fsm.targetTransform.position - Fsm.FirePoint.position;
-            if (direction.sqrMagnitude < 0.001f)
+            if (direction.sqrMagnitude < 2f)
             {
-                Debug.LogError("[TurretAttackState] Cannot fire: target is too close to the fire point.", Fsm);
+                Fsm.TransitionTo("Targeting");
                 return;
             }
 
-            GameObject projectile = Object.Instantiate(Fsm.ProjectilePrefab, Fsm.FirePoint.position, Fsm.turretHead.localRotation );
-            Rigidbody projectileRigidbody = projectile.GetComponent<Rigidbody>();
-            if (projectileRigidbody == null)
+            if (_fireTime >= Fsm.FireRate)
             {
-                Debug.LogError($"[TurretAttackState] Projectile '{projectile.name}' has no Rigidbody.", projectile);
-                Object.Destroy(projectile);
-                return;
-            }
+                _fireTime = 0f;
+                GameObject projectile = Object.Instantiate(Fsm.ProjectilePrefab, Fsm.FirePoint.position, Fsm.turretHead.localRotation );
+                projectile.GetComponent<TurretProjectile>().pushForce = Fsm.ProjectileForce;
+                Rigidbody projectileRigidbody = projectile.GetComponent<Rigidbody>();
+                if (!projectileRigidbody)
+                {
+                    Debug.LogError($"[TurretAttackState] Projectile '{projectile.name}' has no Rigidbody.", projectile);
+                    Object.Destroy(projectile);
+                    return;
+                }
 
-            projectileRigidbody.AddForce(direction.normalized * Fsm.ProjectileForce, ForceMode.Impulse);
+                projectileRigidbody.AddForce(Fsm.turretHead.forward * Fsm.ProjectileSpeed, ForceMode.Impulse);
+            }
             
             Fsm.TransitionTo("Targeting");
         }
