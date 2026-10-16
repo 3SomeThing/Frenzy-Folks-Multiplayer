@@ -14,7 +14,7 @@ namespace Frenzy_Folks.Scripts.Startup
         
         // Network specifics
         public string LastIP = "";
-        public int LastPort = -1;
+        public ushort LastPort = 0;
 
         private static string SavePath =>
             Path.Combine(Application.persistentDataPath, "user-settings.json");
@@ -31,7 +31,6 @@ namespace Frenzy_Folks.Scripts.Startup
 
         public UserSettings Load()
         {
-            Debug.Log(SavePath);
             if(File.Exists(SavePath)) JsonUtility.FromJsonOverwrite(File.ReadAllText(SavePath), this);
             return this;
         }

@@ -209,7 +209,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92c45dda344a44c68e10bf852d02b779, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pushSpeed: 5
+  pushSpeed: 100
   blowingDuration: 7
   pauseDuration: 5
   sweepAngle: 45

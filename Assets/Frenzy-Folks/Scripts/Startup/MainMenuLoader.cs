@@ -1,14 +1,17 @@
-﻿using UnityEngine;
+﻿using Frenzy_Folks.Scripts.Startup;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Frenzy_Folks.Scripts.Startup
+public class MainMenuLoader : MonoBehaviour
 {
-    public class MainMenuLoader : MonoBehaviour
+    private void Awake()
     {
-        private void Awake()
-        {
-            SceneManager.LoadScene("MainMenu");
-            UserSettings.Singleton.Load();
-        }
+        LoadMainMenu();
+        UserSettings.Singleton.Load();
+    }
+
+    public static void LoadMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 }

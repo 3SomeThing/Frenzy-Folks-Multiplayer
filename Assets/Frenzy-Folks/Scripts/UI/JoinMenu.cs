@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Frenzy_Folks.Scripts.Startup;
 using TMPro;
 using UnityEngine;
@@ -23,7 +22,7 @@ public class JoinMenu : MonoBehaviour
         if (!string.IsNullOrWhiteSpace(UserSettings.Singleton.LastIP))
             ipField.text = UserSettings.Singleton.LastIP;
 
-        if (UserSettings.Singleton.LastPort != -1)
+        if (UserSettings.Singleton.LastPort != 0)
             portField.text = UserSettings.Singleton.LastPort.ToString();
     }
 
@@ -31,8 +30,7 @@ public class JoinMenu : MonoBehaviour
     {
         if (!ValidateInputs(true)) return;
 
-        // Join Game Logic
-        Debug.Log("Connecting to game :D");
+        FrenzyNetworkManager.Get().ConnectToServer(UserSettings.Singleton.LastIP, UserSettings.Singleton.LastPort);
     }
 
     private bool ValidateInputs(bool saveInputs)
@@ -40,7 +38,7 @@ public class JoinMenu : MonoBehaviour
         string playerName = playerNameField.text;
         string ip = ipField.text;
         string portText = portField.text;
-        
+
         if (string.IsNullOrWhiteSpace(playerName))
         {
             Debug.LogError("Name can not be empty");
@@ -56,7 +54,7 @@ public class JoinMenu : MonoBehaviour
             return false;
         }
 
-        if (!int.TryParse(portText, out int port))
+        if (!ushort.TryParse(portText, out ushort port))
         {
             Debug.LogError("Invalid Port");
             return false;
