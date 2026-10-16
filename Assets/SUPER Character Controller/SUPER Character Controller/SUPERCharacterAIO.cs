@@ -10,6 +10,7 @@ using UnityEditor;
 #endif
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.Interactions;
 #endif
 
@@ -154,6 +155,8 @@ public class SUPERCharacterAIO : MonoBehaviour{
     PhysicsMaterial _ZeroFriction, _MaxFriction;
     CapsuleCollider capsule;
     Rigidbody p_Rigidbody;
+    MovablePlatform currentMovingPlatform;
+    Vector3 movingPlatformPosition;
     bool crouchInput_Momentary, crouchInput_FrameOf, sprintInput_FrameOf,sprintInput_Momentary, slideInput_FrameOf, slideInput_Momentary;
     bool changingStances = false; 
 
@@ -165,7 +168,9 @@ public class SUPERCharacterAIO : MonoBehaviour{
     //Sliding
     Vector3 cachedDirPreSlide, cachedPosPreSlide;
 
-
+    public float MaxNetworkMovementSpeed => Mathf.Max(walkingSpeed, sprintingSpeed, crouchingSpeed) / 50f;
+    public float MaxNetworkJumpSpeed => jumpPower / 10f;
+    public float NetworkCapsuleHeight => capsule != null ? capsule.height : 2f;
 
     [Space(20)]
     #endregion
@@ -450,8 +455,10 @@ public class SUPERCharacterAIO : MonoBehaviour{
             #if SAIO_ENABLE_PARKOUR
             vaultInput = Keyboard.current[VaultKey].isPressed;
             #endif
-            MovInput.x = Keyboard.current.aKey.isPressed ? -1 : Keyboard.current.dKey.isPressed ? 1 : 0;
-            MovInput.y = Keyboard.current.wKey.isPressed ? 1 : Keyboard.current.sKey.isPressed ? -1 : 0;
+            MovInput.x = (IsLayoutKeyPressed(Keyboard.current, "d") ? 1 : 0)
+                - ((IsLayoutKeyPressed(Keyboard.current, "a") || IsLayoutKeyPressed(Keyboard.current, "q")) ? 1 : 0);
+            MovInput.y = ((IsLayoutKeyPressed(Keyboard.current, "w") || IsLayoutKeyPressed(Keyboard.current, "z")) ? 1 : 0)
+                - (IsLayoutKeyPressed(Keyboard.current, "s") ? 1 : 0);
         #else
             //camera
             MouseXY.x = Input.GetAxis("Mouse Y");
@@ -579,6 +586,18 @@ public class SUPERCharacterAIO : MonoBehaviour{
         UpdateAnimationTriggers(controllerPaused);
         #endregion
     }
+#if ENABLE_INPUT_SYSTEM
+    private static bool IsLayoutKeyPressed(Keyboard keyboard, string key)
+    {
+        if (keyboard == null)
+        {
+            return false;
+        }
+
+        KeyControl keyControl = keyboard.FindKeyOnCurrentKeyboardLayout(key);
+        return keyControl != null && keyControl.isPressed;
+    }
+#endif
     void FixedUpdate() {
         if(!controllerPaused){
 
@@ -587,6 +606,7 @@ public class SUPERCharacterAIO : MonoBehaviour{
             #region Movement
             if(enableMovementControl){
                 GetGroundInfo();
+                ApplyMovingPlatformMovement();
                 MovePlayer(InputDir,currentGroundSpeed);
 
                 if(isSliding){Slide();}
@@ -598,12 +618,51 @@ public class SUPERCharacterAIO : MonoBehaviour{
             pendingMouseXY = Vector2.zero;
              if(cameraPerspective == PerspectiveModes._3rdPerson){
                 UpdateBodyRotation_3rdPerson();
-                UpdateCameraPosition_3rdPerson();
-            }
+             }
   
             #endregion
         }
     }
+    void LateUpdate()
+    {
+        if (!controllerPaused && cameraPerspective == PerspectiveModes._3rdPerson
+            && playerCamera != null && playerCamera.isActiveAndEnabled)
+        {
+            UpdateCameraPosition_3rdPerson();
+        }
+    }
+
+    void ApplyMovingPlatformMovement(){
+        if(Unity.Netcode.NetworkManager.Singleton != null &&
+           Unity.Netcode.NetworkManager.Singleton.IsServer){
+            currentMovingPlatform = null;
+            return;
+        }
+
+        Rigidbody groundBody = currentGroundInfo.groundFromRay.rigidbody;
+        MovablePlatform platform = groundBody
+            ? groundBody.GetComponentInParent<MovablePlatform>()
+            : null;
+
+        if(platform == null){
+            currentMovingPlatform = null;
+            return;
+        }
+
+        if(currentMovingPlatform != platform){
+            currentMovingPlatform = platform;
+            movingPlatformPosition = platform.transform.position;
+            return;
+        }
+
+        Vector3 platformDelta = platform.transform.position - movingPlatformPosition;
+        movingPlatformPosition = platform.transform.position;
+
+        if(platformDelta.sqrMagnitude > 0f){
+            p_Rigidbody.MovePosition(p_Rigidbody.position + platformDelta);
+        }
+    }
+
     private void OnTriggerEnter(Collider other){
         #region Collectables
         other.GetComponent<ICollectable>()?.Collect();
@@ -800,6 +859,8 @@ public class SUPERCharacterAIO : MonoBehaviour{
         }
     }
     void UpdateCameraPosition_3rdPerson(){
+        headPos = transform.position + Vector3.up * standingEyeHeight;
+        quatHeadRot = Quaternion.Euler(headRot);
 
         //Camera Obstacle Check
         cameraObstCheck= new Ray(headPos+(quatHeadRot*(Vector3.forward*capsule.radius)), quatHeadRot*-Vector3.forward); 
@@ -807,7 +868,7 @@ public class SUPERCharacterAIO : MonoBehaviour{
             currentCameraZ = -(Vector3.Distance(headPos,cameraObstResult.point)*0.9f);
 
         }else{
-            currentCameraZ = Mathf.SmoothDamp(currentCameraZ, -(maxCameraDistInternal*0.85f), ref cameraZRef ,Time.deltaTime,10,Time.fixedDeltaTime);
+            currentCameraZ = Mathf.SmoothDamp(currentCameraZ, -(maxCameraDistInternal*0.85f), ref cameraZRef ,Time.deltaTime,10,Time.deltaTime);
         }
 
         //Debugging

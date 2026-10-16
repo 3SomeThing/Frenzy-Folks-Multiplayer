@@ -31,7 +31,6 @@ MonoBehaviour:
       Hash: c16915d1f789adfc5d3631ffc39c502e
     m_InstanceItems:
     - rid: 5207451244518703970
-    - rid: 5207451244518703971
   references:
     version: 2
     RefIds:
@@ -45,16 +44,4 @@ MonoBehaviour:
           PlayerTag: 
           RoleMask: 1
           InitialScene: {fileID: 102900000, guid: d92d7f12ddfcf77409d6dbed0f0a922a, type: 3}
-        m_Decorators: []
-    - rid: 5207451244518703971
-      type: {class: 'InstanceItem`2[[Unity.Multiplayer.PlayMode.Editor.LocalPlayerController, UnityEditor.MultiplayerModule],[Unity.Multiplayer.PlayMode.Editor.LocalPlayerController/InstanceSettings, UnityEditor.MultiplayerModule]]', ns: Unity.Multiplayer.PlayMode.Editor, asm: UnityEditor.MultiplayerModule}
-      data:
-        m_Id: fdf64f6cea324e12957f3ef139891efc
-        m_Name: Instance
-        m_RunMode: 0
-        m_Settings:
-          BuildProfile: {fileID: 11400000, guid: 59f8d26f4992d7f4c81534a3ed9045fa, type: 2}
-          StreamLogsToMainEditor: 0
-          LogsColor: {r: 0.3643, g: 0.581, b: 0.8679, a: 1}
-          Arguments: -screen-fullscreen 0 -screen-width 1024 -screen-height 720
         m_Decorators: []

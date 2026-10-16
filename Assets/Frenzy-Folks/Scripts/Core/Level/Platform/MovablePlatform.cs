@@ -1,19 +1,18 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.Netcode;
 using UnityEngine;
 
-public class MovablePlatform : MonoBehaviour
+public class MovablePlatform : NetworkBehaviour
 {
     [SerializeField] private float speed = 5F;
     [SerializeField] private float pauseDuration = 1F;
-    
-    private List<Vector3> pathPoints = new List<Vector3>()
-    {
-        new Vector3(10, 0.8F, 10),
-        new Vector3(10, 10F, -10),
-        new Vector3(-10, 0.8F, -10),
-        new Vector3(-10, 5F, 10),
-    };
+
+    public float Speed => speed;
+
+    private List<Vector3> pathPoints = new List<Vector3>();
 
     private int _currentPathIndex;
     private bool isPaused;
@@ -32,6 +31,62 @@ public class MovablePlatform : MonoBehaviour
         pathPoints.AddRange(points);
         _currentPathIndex = 0;
     }
+
+    // private void OnTriggerEnter(Collider other)
+    // {
+    //     if (!IsServer) return;
+    //     
+    //     Debug.Log("VAR");
+    //     NetworkPlayer player = other.gameObject.GetComponent<NetworkPlayer>();
+    //
+    //     if (!player) return;
+    //
+    //     Debug.Log("VAR2");
+    //     Rigidbody playerBody = player.GetComponent<Rigidbody>();
+    //     if (Math.Abs(playerBody.linearVelocity.y /*- _body.linearVelocity.y*/) < 0.1F) return;
+    //
+    //     player.NetworkObject.TrySetParent(gameObject);
+    // }
+    //
+    // private void OnTriggerExit(Collider other)
+    // {
+    //     if (!IsServer) return;
+    //     
+    //     Debug.Log("lalala");
+    //     NetworkPlayer player = other.gameObject.GetComponent<NetworkPlayer>();
+    //
+    //     if (!player) return;
+    //     Debug.Log("lalala2");
+    //
+    //     Rigidbody playerBody = player.GetComponent<Rigidbody>();
+    //     if (Math.Abs(playerBody.linearVelocity.y /*- _body.linearVelocity.y*/) < 0.1F) return;
+    //
+    //     player.NetworkObject.TryRemoveParent();
+    // }
+
+    // private void OnCollisionEnter(Collision collision)
+    // {
+    //     NetworkPlayer player = collision.gameObject.GetComponent<NetworkPlayer>();
+    //
+    //     if (!player) return;
+    //     
+    //     bool fromTop = collision.contacts.Any(contact => contact.normal.y < 0F);
+    //     if (!fromTop) return;
+    //     
+    //     player.NetworkObject.TrySetParent(gameObject);
+    // }
+    //
+    // private void OnCollisionExit(Collision collision)
+    // {
+    //     NetworkPlayer player = collision.gameObject.GetComponent<NetworkPlayer>();
+    //
+    //     if (!player) return;
+    //
+    //     Rigidbody playerBody = player.GetComponent<Rigidbody>();
+    //     if (Math.Abs(playerBody.linearVelocity.y /*- _body.linearVelocity.y*/) < 0.1F) return;
+    //
+    //     player.NetworkObject.TryRemoveParent();
+    // }
 
     private void FixedUpdate()
     {

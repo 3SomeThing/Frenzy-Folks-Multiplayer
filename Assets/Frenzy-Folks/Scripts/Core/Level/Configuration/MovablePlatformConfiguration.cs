@@ -6,8 +6,8 @@ using UnityEngine.Serialization;
 [Serializable]
 public class MovablePlatformConfiguration : LevelElementConfiguration<MovablePlatform, MovablePlatformConfiguration>
 {
-    [SerializeField] private float speed = 5F;
-    [SerializeField] private List<Vector3> pathPoints = new List<Vector3>();
+    [SerializeField] public float speed = 5F;
+    [SerializeField] public List<Vector3> pathPoints = new List<Vector3>();
 
     public override void Apply(MovablePlatform target)
     {
