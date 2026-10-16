@@ -64,7 +64,7 @@ public class FrenzyLevelConfiguration
             }
         }
 
-        Debug.Log(frenzyLevelConfiguration.configurationEntries[0].value.transform);
+        // Debug.Log(frenzyLevelConfiguration.configurationEntries[0].value.transform);
 
         return frenzyLevelConfiguration;
     }

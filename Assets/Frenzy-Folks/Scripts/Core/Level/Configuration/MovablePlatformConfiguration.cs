@@ -11,7 +11,6 @@ public class MovablePlatformConfiguration : LevelElementConfiguration<MovablePla
 
     public override void Apply(MovablePlatform target)
     {
-        transform.Apply(target.transform);
         target.SetPathPoints(pathPoints);
     }
 

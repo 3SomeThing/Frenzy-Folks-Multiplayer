@@ -182,7 +182,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4011650199783796440, guid: 8290bc46be1825d49932e2492480426b, type: 3}
       propertyPath: Sensitivity
-      value: 10
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 4011650199783796440, guid: 8290bc46be1825d49932e2492480426b, type: 3}
       propertyPath: interactKey
@@ -455,6 +455,7 @@ MonoBehaviour:
   - {fileID: 3443985966346653991}
   - {fileID: 1655421244789135373}
   - {fileID: 1655421244789135373}
+  serverPositionTolerance: 0.2
 --- !u!114 &1697686418009933519
 MonoBehaviour:
   m_ObjectHideFlags: 0

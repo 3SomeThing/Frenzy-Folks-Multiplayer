@@ -6,11 +6,15 @@ public abstract class LevelElementConfiguration<TLevelElement, TConfiguration>
     where TLevelElement : Component
     where TConfiguration : BaseConfigurationSerializable
 {
+    [SerializeField] public string name;
+    [SerializeField] public SerializableTransform transform;
+    
     public abstract void Apply(TLevelElement target);
     public abstract TConfiguration From(TLevelElement source);
 
     public sealed override GameObject Apply(GameObject target)
     {
+        transform.Apply(target.transform);
         Apply(GetLevelElement(target));
         return target;
     }
