@@ -1,28 +1,33 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class MovablePlatform : NetworkBehaviour
 {
-    [SerializeField] private float speed = 5F;
-    [SerializeField] private float pauseDuration = 1F;
+    [SerializeField] private float speed = 5f;
+    [SerializeField] private float pauseDuration = 1f;
 
     public float Speed => speed;
 
-    private List<Vector3> pathPoints = new List<Vector3>();
+    /// <summary>World-space velocity of the platform, valid on host AND clients.</summary>
+    public Vector3 Velocity { get; private set; }
 
+    private readonly List<Vector3> pathPoints = new();
     private int _currentPathIndex;
-    private bool isPaused;
-    private IEnumerator pauseCoroutine;
-    
+    private float _pauseTimer;
+
     private Rigidbody _body;
+    private Vector3 _lastObservedPos;
+    private bool _hasObserved;
+
+    // Server (or offline) drives the movement, clients only observe it
+    private bool HasAuthority => !IsSpawned || IsServer;
 
     private void Awake()
     {
         _body = GetComponent<Rigidbody>();
+        _body.isKinematic = true; // on every instance; NetworkTransform moves it on clients
     }
 
     public void SetPathPoints(List<Vector3> points)
@@ -30,87 +35,57 @@ public class MovablePlatform : NetworkBehaviour
         pathPoints.Clear();
         pathPoints.AddRange(points);
         _currentPathIndex = 0;
+        _pauseTimer = 0f;
     }
-
-    // private void OnTriggerEnter(Collider other)
-    // {
-    //     if (!IsServer) return;
-    //     
-    //     Debug.Log("VAR");
-    //     NetworkPlayer player = other.gameObject.GetComponent<NetworkPlayer>();
-    //
-    //     if (!player) return;
-    //
-    //     Debug.Log("VAR2");
-    //     Rigidbody playerBody = player.GetComponent<Rigidbody>();
-    //     if (Math.Abs(playerBody.linearVelocity.y /*- _body.linearVelocity.y*/) < 0.1F) return;
-    //
-    //     player.NetworkObject.TrySetParent(gameObject);
-    // }
-    //
-    // private void OnTriggerExit(Collider other)
-    // {
-    //     if (!IsServer) return;
-    //     
-    //     Debug.Log("lalala");
-    //     NetworkPlayer player = other.gameObject.GetComponent<NetworkPlayer>();
-    //
-    //     if (!player) return;
-    //     Debug.Log("lalala2");
-    //
-    //     Rigidbody playerBody = player.GetComponent<Rigidbody>();
-    //     if (Math.Abs(playerBody.linearVelocity.y /*- _body.linearVelocity.y*/) < 0.1F) return;
-    //
-    //     player.NetworkObject.TryRemoveParent();
-    // }
-
-    // private void OnCollisionEnter(Collision collision)
-    // {
-    //     NetworkPlayer player = collision.gameObject.GetComponent<NetworkPlayer>();
-    //
-    //     if (!player) return;
-    //     
-    //     bool fromTop = collision.contacts.Any(contact => contact.normal.y < 0F);
-    //     if (!fromTop) return;
-    //     
-    //     player.NetworkObject.TrySetParent(gameObject);
-    // }
-    //
-    // private void OnCollisionExit(Collision collision)
-    // {
-    //     NetworkPlayer player = collision.gameObject.GetComponent<NetworkPlayer>();
-    //
-    //     if (!player) return;
-    //
-    //     Rigidbody playerBody = player.GetComponent<Rigidbody>();
-    //     if (Math.Abs(playerBody.linearVelocity.y /*- _body.linearVelocity.y*/) < 0.1F) return;
-    //
-    //     player.NetworkObject.TryRemoveParent();
-    // }
 
     private void FixedUpdate()
     {
-        if (pathPoints.Count == 0 || isPaused)
-            return;
+        if (HasAuthority) ServerStep();
+        else ObserveStep();
+    }
 
-        Vector3 target = pathPoints[_currentPathIndex];
-        _body.MovePosition(Vector3.MoveTowards(
-            _body.position, target, speed * Time.fixedDeltaTime));
-
-        if (Vector3.Distance(_body.position, target) < 0.01F)
+    private void ServerStep()
+    {
+        if (pathPoints.Count == 0)
         {
-            isPaused = true;
+            Velocity = Vector3.zero;
+            return;
+        }
+
+        if (_pauseTimer > 0f)
+        {
+            _pauseTimer -= Time.fixedDeltaTime;
+            Velocity = Vector3.zero;
+            return;
+        }
+
+        Vector3 current = _body.position;
+        Vector3 target = pathPoints[_currentPathIndex];
+        Vector3 next = Vector3.MoveTowards(current, target, speed * Time.fixedDeltaTime);
+
+        Velocity = (next - current) / Time.fixedDeltaTime;
+        _body.MovePosition(next);
+
+        if ((next - target).sqrMagnitude < 0.0001f)
+        {
             _currentPathIndex = (_currentPathIndex + 1) % pathPoints.Count;
-            
-            StartCoroutine(pauseCoroutine = PausePlatform());
+            _pauseTimer = pauseDuration;
         }
     }
 
-    private IEnumerator PausePlatform()
+    private void ObserveStep()
     {
-        yield return new WaitForSeconds(pauseDuration);
-        
-        isPaused = false;
-        StopCoroutine(pauseCoroutine);
+        // Measure what the player actually stands on (the NetworkTransform-driven copy)
+        Vector3 pos = transform.position;
+
+        if (_hasObserved)
+        {
+            Vector3 raw = (pos - _lastObservedPos) / Time.fixedDeltaTime;
+            float alpha = 1f - Mathf.Exp(-25f * Time.fixedDeltaTime); // light smoothing
+            Velocity = Vector3.Lerp(Velocity, raw, alpha);
+        }
+
+        _lastObservedPos = pos;
+        _hasObserved = true;
     }
 }

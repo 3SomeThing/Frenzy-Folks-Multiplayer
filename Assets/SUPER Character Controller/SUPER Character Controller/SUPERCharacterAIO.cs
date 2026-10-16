@@ -10,7 +10,6 @@ using UnityEditor;
 #endif
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.Interactions;
 #endif
 
@@ -72,7 +71,6 @@ public class SUPERCharacterAIO : MonoBehaviour{
     
     //Both
     Vector2 MouseXY;
-    Vector2 pendingMouseXY;
     Vector2 viewRotVelRef;
     bool isInFirstPerson, isInThirdPerson, perspecTog;
     bool setInitialRot = true;
@@ -155,8 +153,6 @@ public class SUPERCharacterAIO : MonoBehaviour{
     PhysicsMaterial _ZeroFriction, _MaxFriction;
     CapsuleCollider capsule;
     Rigidbody p_Rigidbody;
-    MovablePlatform currentMovingPlatform;
-    Vector3 movingPlatformPosition;
     bool crouchInput_Momentary, crouchInput_FrameOf, sprintInput_FrameOf,sprintInput_Momentary, slideInput_FrameOf, slideInput_Momentary;
     bool changingStances = false; 
 
@@ -168,9 +164,7 @@ public class SUPERCharacterAIO : MonoBehaviour{
     //Sliding
     Vector3 cachedDirPreSlide, cachedPosPreSlide;
 
-    public float MaxNetworkMovementSpeed => Mathf.Max(walkingSpeed, sprintingSpeed, crouchingSpeed) / 50f;
-    public float MaxNetworkJumpSpeed => jumpPower / 10f;
-    public float NetworkCapsuleHeight => capsule != null ? capsule.height : 2f;
+
 
     [Space(20)]
     #endregion
@@ -455,10 +449,8 @@ public class SUPERCharacterAIO : MonoBehaviour{
             #if SAIO_ENABLE_PARKOUR
             vaultInput = Keyboard.current[VaultKey].isPressed;
             #endif
-            MovInput.x = (IsLayoutKeyPressed(Keyboard.current, "d") ? 1 : 0)
-                - ((IsLayoutKeyPressed(Keyboard.current, "a") || IsLayoutKeyPressed(Keyboard.current, "q")) ? 1 : 0);
-            MovInput.y = ((IsLayoutKeyPressed(Keyboard.current, "w") || IsLayoutKeyPressed(Keyboard.current, "z")) ? 1 : 0)
-                - (IsLayoutKeyPressed(Keyboard.current, "s") ? 1 : 0);
+            MovInput.x = Keyboard.current.aKey.isPressed ? -1 : Keyboard.current.dKey.isPressed ? 1 : 0;
+            MovInput.y = Keyboard.current.wKey.isPressed ? 1 : Keyboard.current.sKey.isPressed ? -1 : 0;
         #else
             //camera
             MouseXY.x = Input.GetAxis("Mouse Y");
@@ -482,7 +474,6 @@ public class SUPERCharacterAIO : MonoBehaviour{
             #endif
             MovInput = Vector2.up *Input.GetAxisRaw("Vertical") + Vector2.right * Input.GetAxisRaw("Horizontal");
         #endif
-            pendingMouseXY += MouseXY;
         #endregion
 
         #region Camera
@@ -586,18 +577,6 @@ public class SUPERCharacterAIO : MonoBehaviour{
         UpdateAnimationTriggers(controllerPaused);
         #endregion
     }
-#if ENABLE_INPUT_SYSTEM
-    private static bool IsLayoutKeyPressed(Keyboard keyboard, string key)
-    {
-        if (keyboard == null)
-        {
-            return false;
-        }
-
-        KeyControl keyControl = keyboard.FindKeyOnCurrentKeyboardLayout(key);
-        return keyControl != null && keyControl.isPressed;
-    }
-#endif
     void FixedUpdate() {
         if(!controllerPaused){
 
@@ -606,7 +585,6 @@ public class SUPERCharacterAIO : MonoBehaviour{
             #region Movement
             if(enableMovementControl){
                 GetGroundInfo();
-                ApplyMovingPlatformMovement();
                 MovePlayer(InputDir,currentGroundSpeed);
 
                 if(isSliding){Slide();}
@@ -614,55 +592,15 @@ public class SUPERCharacterAIO : MonoBehaviour{
             #endregion
 
             #region Camera
-            RotateView(pendingMouseXY, Sensitivity, rotationWeight);
-            pendingMouseXY = Vector2.zero;
+            RotateView(MouseXY, Sensitivity, rotationWeight);
              if(cameraPerspective == PerspectiveModes._3rdPerson){
                 UpdateBodyRotation_3rdPerson();
-             }
+                UpdateCameraPosition_3rdPerson();
+            }
   
             #endregion
         }
     }
-    void LateUpdate()
-    {
-        if (!controllerPaused && cameraPerspective == PerspectiveModes._3rdPerson
-            && playerCamera != null && playerCamera.isActiveAndEnabled)
-        {
-            UpdateCameraPosition_3rdPerson();
-        }
-    }
-
-    void ApplyMovingPlatformMovement(){
-        if(Unity.Netcode.NetworkManager.Singleton != null &&
-           Unity.Netcode.NetworkManager.Singleton.IsServer){
-            currentMovingPlatform = null;
-            return;
-        }
-
-        Rigidbody groundBody = currentGroundInfo.groundFromRay.rigidbody;
-        MovablePlatform platform = groundBody
-            ? groundBody.GetComponentInParent<MovablePlatform>()
-            : null;
-
-        if(platform == null){
-            currentMovingPlatform = null;
-            return;
-        }
-
-        if(currentMovingPlatform != platform){
-            currentMovingPlatform = platform;
-            movingPlatformPosition = platform.transform.position;
-            return;
-        }
-
-        Vector3 platformDelta = platform.transform.position - movingPlatformPosition;
-        movingPlatformPosition = platform.transform.position;
-
-        if(platformDelta.sqrMagnitude > 0f){
-            p_Rigidbody.MovePosition(p_Rigidbody.position + platformDelta);
-        }
-    }
-
     private void OnTriggerEnter(Collider other){
         #region Collectables
         other.GetComponent<ICollectable>()?.Collect();
@@ -859,8 +797,6 @@ public class SUPERCharacterAIO : MonoBehaviour{
         }
     }
     void UpdateCameraPosition_3rdPerson(){
-        headPos = transform.position + Vector3.up * standingEyeHeight;
-        quatHeadRot = Quaternion.Euler(headRot);
 
         //Camera Obstacle Check
         cameraObstCheck= new Ray(headPos+(quatHeadRot*(Vector3.forward*capsule.radius)), quatHeadRot*-Vector3.forward); 
@@ -868,7 +804,7 @@ public class SUPERCharacterAIO : MonoBehaviour{
             currentCameraZ = -(Vector3.Distance(headPos,cameraObstResult.point)*0.9f);
 
         }else{
-            currentCameraZ = Mathf.SmoothDamp(currentCameraZ, -(maxCameraDistInternal*0.85f), ref cameraZRef ,Time.deltaTime,10,Time.deltaTime);
+            currentCameraZ = Mathf.SmoothDamp(currentCameraZ, -(maxCameraDistInternal*0.85f), ref cameraZRef ,Time.deltaTime,10,Time.fixedDeltaTime);
         }
 
         //Debugging
@@ -912,33 +848,10 @@ public class SUPERCharacterAIO : MonoBehaviour{
                 p_Rigidbody.AddForce(-new Vector3(p_Rigidbody.linearVelocity.x,currentGroundInfo.isInContactWithGround? p_Rigidbody.linearVelocity.y-  Physics.gravity.y:0,p_Rigidbody.linearVelocity.z)*(decelerationSpeed*Time.fixedDeltaTime),ForceMode.Force); 
             }
             //normal speed
-            // else if((currentGroundInfo.isGettingGroundInfo) && currentGroundInfo.groundAngle<hardSlopeLimit && currentGroundInfo.groundAngle_Raw<hardSlopeLimit){
-            //     p_Rigidbody.linearVelocity = (Vector3.MoveTowards(p_Rigidbody.linearVelocity,Vector3.ClampMagnitude(((Direction)*((Speed)*Time.fixedDeltaTime))+(Vector3.down),Speed/50),1));
-            // }
-            else if ((currentGroundInfo.isGettingGroundInfo) &&
-                     currentGroundInfo.groundAngle < hardSlopeLimit &&
-                     currentGroundInfo.groundAngle_Raw < hardSlopeLimit)
-            {
-                Rigidbody groundBody = currentGroundInfo.groundFromRay.rigidbody;
-                Vector3 groundVelocity = groundBody
-                    ? groundBody.GetPointVelocity(currentGroundInfo.groundFromRay.point)
-                    : Vector3.zero;
-
-                Vector3 targetVelocity = Vector3.ClampMagnitude(
-                    (Direction * (Speed * Time.fixedDeltaTime)) + Vector3.down,
-                    Speed / 50);
-
-                Vector3 relativeVelocity = p_Rigidbody.linearVelocity - groundVelocity;
-                p_Rigidbody.linearVelocity =
-                    Vector3.MoveTowards(relativeVelocity, targetVelocity, 1) + groundVelocity;
+            else if((currentGroundInfo.isGettingGroundInfo) && currentGroundInfo.groundAngle<hardSlopeLimit && currentGroundInfo.groundAngle_Raw<hardSlopeLimit){
+                p_Rigidbody.linearVelocity = (Vector3.MoveTowards(p_Rigidbody.linearVelocity,Vector3.ClampMagnitude(((Direction)*((Speed)*Time.fixedDeltaTime))+(Vector3.down),Speed/50),1));
             }
-            // capsule.sharedMaterial = InputDir.magnitude>0 ? _ZeroFriction : _MaxFriction;
-            Rigidbody groundRigidbody = currentGroundInfo.groundFromRay.rigidbody;
-            bool onKinematicPlatform = groundRigidbody && groundRigidbody.isKinematic;
-
-            capsule.sharedMaterial = onKinematicPlatform || InputDir.magnitude == 0
-                ? _MaxFriction
-                : _ZeroFriction;
+            capsule.sharedMaterial = InputDir.magnitude>0 ? _ZeroFriction : _MaxFriction;
         }
         //Sliding
         else if(isSliding){
@@ -947,13 +860,10 @@ public class SUPERCharacterAIO : MonoBehaviour{
         
         //Air Control
         else if(!currentGroundInfo.isGettingGroundInfo){
-            Vector3 horizontalVelocity = Vector3.ProjectOnPlane(p_Rigidbody.linearVelocity, Vector3.up);
-            Vector3 airControlVelocityChange = Vector3.ProjectOnPlane(Direction, Vector3.up)
-                * walkingSpeed * Time.fixedDeltaTime * airControlFactor * 5
-                * currentGroundInfo.groundAngleMultiplier_Inverse_persistent * Time.fixedDeltaTime;
-            float maxAirSpeed = Mathf.Max(horizontalVelocity.magnitude, walkingSpeed / 50);
-            horizontalVelocity = Vector3.ClampMagnitude(horizontalVelocity + airControlVelocityChange, maxAirSpeed);
-            p_Rigidbody.linearVelocity = horizontalVelocity + Vector3.up * p_Rigidbody.linearVelocity.y;
+            p_Rigidbody.AddForce((((Direction*(walkingSpeed))*Time.fixedDeltaTime)*airControlFactor*5)*currentGroundInfo.groundAngleMultiplier_Inverse_persistent,ForceMode.Acceleration);
+            
+            // UNCOMMENT BELOW TO REMOVE SPEED LIMIT WHEN NOT TOUCHING GROUND
+            // p_Rigidbody.linearVelocity= Vector3.ClampMagnitude((Vector3.right*p_Rigidbody.linearVelocity.x + Vector3.forward*p_Rigidbody.linearVelocity.z) ,(walkingSpeed/50))+(Vector3.up*p_Rigidbody.linearVelocity.y);
             
             if(!currentGroundInfo.potentialStair && jumpEnhancements){
                 if(p_Rigidbody.linearVelocity.y < 0 && p_Rigidbody.linearVelocity.y> Physics.gravity.y*1.5f){
@@ -964,6 +874,7 @@ public class SUPERCharacterAIO : MonoBehaviour{
             }
         }
 
+        
     }
     void Jump(float Force){
         if((currentGroundInfo.isInContactWithGround) && 
