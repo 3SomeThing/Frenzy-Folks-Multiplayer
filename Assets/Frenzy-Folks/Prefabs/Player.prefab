@@ -201,12 +201,20 @@ PrefabInstance:
       value: 500
       objectReference: {fileID: 0}
     - target: {fileID: 4011650199783796440, guid: 8290bc46be1825d49932e2492480426b, type: 3}
+      propertyPath: airControlFactor
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4011650199783796440, guid: 8290bc46be1825d49932e2492480426b, type: 3}
       propertyPath: bodyCatchupSpeed
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4011650199783796440, guid: 8290bc46be1825d49932e2492480426b, type: 3}
       propertyPath: lockAndHideMouse
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4011650199783796440, guid: 8290bc46be1825d49932e2492480426b, type: 3}
+      propertyPath: decelerationSpeed
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 4011650199783796440, guid: 8290bc46be1825d49932e2492480426b, type: 3}
       propertyPath: standingEyeHeight
@@ -235,6 +243,10 @@ PrefabInstance:
     - target: {fileID: 4011650199783796440, guid: 8290bc46be1825d49932e2492480426b, type: 3}
       propertyPath: inputResponseFiltering
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4011650199783796440, guid: 8290bc46be1825d49932e2492480426b, type: 3}
+      propertyPath: enableMovementDebugging
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4011650199783796440, guid: 8290bc46be1825d49932e2492480426b, type: 3}
       propertyPath: perspectiveSwitchingKey
@@ -307,6 +319,10 @@ PrefabInstance:
     - target: {fileID: 4011650199783796442, guid: 8290bc46be1825d49932e2492480426b, type: 3}
       propertyPath: m_Layer
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4011650199783796442, guid: 8290bc46be1825d49932e2492480426b, type: 3}
+      propertyPath: m_TagString
+      value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 4011650200241831707, guid: 8290bc46be1825d49932e2492480426b, type: 3}
       propertyPath: m_Enabled
@@ -423,7 +439,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 2438557936
+  GlobalObjectIdHash: 2209091663
   InScenePlacedSourceGlobalObjectIdHash: 0
   m_InScenePlacedDisabledByDefault: 0
   DeferredDespawnTick: 0

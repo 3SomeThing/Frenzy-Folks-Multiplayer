@@ -129,6 +129,7 @@ public class SUPERCharacterAIO : MonoBehaviour{
     #endif
     [Range(1.0f,650.0f)] public float jumpPower = 40;
     [Range(0.0f,1.0f)] public float airControlFactor = 1;
+    [Range(0.0f,1.0f)] public float jumpVelocityRetentionFactor = 0.5f;
     public float decentMultiplier = 2.5f, tapJumpMultiplier = 2.1f;
     float jumpBlankingPeriod;
 
@@ -848,7 +849,7 @@ public class SUPERCharacterAIO : MonoBehaviour{
         {
             //Deceleration
             if(Direction.magnitude==0&& p_Rigidbody.linearVelocity.normalized.magnitude>0.1f){
-                p_Rigidbody.AddForce(-new Vector3(p_Rigidbody.linearVelocity.x,currentGroundInfo.isInContactWithGround? p_Rigidbody.linearVelocity.y-  Physics.gravity.y:0,p_Rigidbody.linearVelocity.z)*(decelerationSpeed*Time.fixedDeltaTime),ForceMode.Force); 
+                p_Rigidbody.AddForce(-new Vector3(p_Rigidbody.linearVelocity.x,currentGroundInfo.isInContactWithGround? p_Rigidbody.linearVelocity.y - Physics.gravity.y : 0, p_Rigidbody.linearVelocity.z)*(decelerationSpeed*Time.fixedDeltaTime),ForceMode.Force); 
             }
             //normal speed
             else if((currentGroundInfo.isGettingGroundInfo) && currentGroundInfo.groundAngle<hardSlopeLimit && currentGroundInfo.groundAngle_Raw<hardSlopeLimit){
@@ -881,7 +882,7 @@ public class SUPERCharacterAIO : MonoBehaviour{
         }
 
     }
-    void Jump(float Force){
+    public void Jump(float Force){
         if((currentGroundInfo.isInContactWithGround) && 
             (currentGroundInfo.groundAngle<hardSlopeLimit) && 
             ((enableStaminaSystem && jumpingDepletesStamina)? currentStaminaLevel>s_JumpStaminaDepletion*1.2f : true) && 
@@ -890,6 +891,7 @@ public class SUPERCharacterAIO : MonoBehaviour{
 
                 Jumped = true;
                 p_Rigidbody.linearVelocity =(Vector3.right * p_Rigidbody.linearVelocity.x) + (Vector3.forward * p_Rigidbody.linearVelocity.z);
+                p_Rigidbody.linearVelocity *= jumpVelocityRetentionFactor;
                 p_Rigidbody.AddForce(Vector3.up*(Force/10),ForceMode.Impulse);
                 if(enableStaminaSystem && jumpingDepletesStamina){
                     InstantStaminaReduction(s_JumpStaminaDepletion);
@@ -1849,6 +1851,7 @@ public class SuperFPEditor : Editor{
             t.holdJump = EditorGUILayout.ToggleLeft(new GUIContent("Continuous Jumping", "Should the player be able to continue jumping without letting go of the Jump key"),t.holdJump);
             t.jumpPower = EditorGUILayout.Slider(new GUIContent("Jump Power", "How much power should a jump have?"),t.jumpPower,1,650f);
             t.airControlFactor = EditorGUILayout.Slider(new GUIContent("Air Control Factor", "EXPERIMENTAL: How much control should the player have over their direction while in the air"),t.airControlFactor,0,1);
+            t.jumpVelocityRetentionFactor = EditorGUILayout.Slider(new GUIContent("Jump Velocity Retention Factor", "How much of the player's current velocity should be retained when jumping?"),t.jumpVelocityRetentionFactor,0,1);
             GUI.enabled = t.enableStaminaSystem;
                 t.jumpingDepletesStamina = EditorGUILayout.ToggleLeft(new GUIContent("Jumping Depletes Stamina", "Should jumping deplete stamina?"),t.jumpingDepletesStamina);
                 t.s_JumpStaminaDepletion = EditorGUILayout.Slider(new GUIContent("Jump Stamina Depletion Amount", "How much stamina should jumping use?"),t.s_JumpStaminaDepletion, 0, t.Stamina);
