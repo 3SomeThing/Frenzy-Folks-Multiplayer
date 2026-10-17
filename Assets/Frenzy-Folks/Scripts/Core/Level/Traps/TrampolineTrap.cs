@@ -1,10 +1,12 @@
 ﻿using SUPERCharacter;
+using Unity.Netcode;
 using UnityEngine;
 using SimpleUnitySprings;
 
-public class BumperTrap : BumperTrapConfiguration
+public class TrampolineTrap : MonoBehaviour
 {
-    [SerializeField] private AudioSource bumperSound;
+    [SerializeField, Min(0f)] public float pushSpeedVertical = 30f;
+    [SerializeField] private AudioSource trampolineSound;
     [SerializeField] private bool debugLogs = false;
     [SerializeField, Min(1f)] private float bumpScale = 1.25f;
     [SerializeField, Min(1f)] private float animationSpeed = 5f;
@@ -28,17 +30,17 @@ public class BumperTrap : BumperTrapConfiguration
         if (playerLayer < 0)
         {
             Debug.LogError(
-                "[BumperTrap] Unity layer 'Player' does not exist. Add it in Project Settings > Tags and Layers.", this);
+                "[TrampolineTrap] Unity layer 'Player' does not exist. Add it in Project Settings > Tags and Layers.", this);
             enabled = false;
             return;
         }
 
-        if (bumperSound == null)
+        if (trampolineSound == null)
         {
-            bumperSound = GetComponent<AudioSource>();
-            if (bumperSound == null && debugLogs)
+            trampolineSound = GetComponent<AudioSource>();
+            if (trampolineSound == null && debugLogs)
             {
-                Debug.LogWarning($"[BumperTrap] No audio sound assigned or found under '{name}'.", this);
+                Debug.LogWarning($"[TrampolineTrap] No audio sound assigned or found under '{name}'.", this);
             }
         }
     }
@@ -63,9 +65,9 @@ public class BumperTrap : BumperTrapConfiguration
         }
     }
 
-    private void OnCollisionEnter(Collision other)
+    private void OnTriggerEnter(Collider other)
     {
-        TryPushPlayer(other.gameObject.GetComponent<Collider>());
+        TryPushPlayer(other);
     }
 
     private void TryPushPlayer(Collider other)
@@ -75,7 +77,7 @@ public class BumperTrap : BumperTrapConfiguration
         {
             if (debugLogs)
             {
-                Debug.Log($"[BumperTrap] Capsule touched '{other.name}', but no SUPERCharacterAIO was found in its parents.", this);
+                Debug.Log($"[TrampolineTrap] Capsule touched '{other.name}', but no SUPERCharacterAIO was found in its parents.", this);
             }
             return;
         }
@@ -84,11 +86,13 @@ public class BumperTrap : BumperTrapConfiguration
         {
             return;
         }
+
+        playSound();
         
         Rigidbody rb = player.GetComponent<Rigidbody>();
         if (rb == null)
         {
-            Debug.LogError($"[BumperTrap] Player '{player.name}' has no Rigidbody for wind force.", player);
+            Debug.LogError($"[TrampolineTrap] Player '{player.name}' has no Rigidbody for wind force.", player);
             return;
         }
 
@@ -96,46 +100,39 @@ public class BumperTrap : BumperTrapConfiguration
         {
             if (debugLogs)
             {
-                Debug.LogWarning($"[BumperTrap] Player '{player.name}' has a kinematic Rigidbody; AddForce will not affect it.", player);
+                Debug.LogWarning($"[TrampolineTrap] Player '{player.name}' has a kinematic Rigidbody; AddForce will not affect it.", player);
             }
 
             return;
         }
 
-        Vector3 direction = player.transform.position - transform.position;
-        direction.Normalize();
-
-        Vector3 horizontalDirection = new Vector3(direction.x, 0f, direction.z).normalized;
-        Vector3 impulseForce = horizontalDirection * pushSpeedHorizontal +
-                               Vector3.up * (direction.y * pushSpeedVertical);
-
+        rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        Vector3 impulseForce = Vector3.up * pushSpeedVertical;
         rb.AddForce(impulseForce, ForceMode.Impulse);
 
         spring.To(bumpScale);
         isBumping = true;
         isReturningToRest = false;
-        toggleSound(true);
 
         if (debugLogs)
         {
-            Debug.Log($"[BumperTrap] Collision hit player '{player.name}'; push={impulseForce}.", player);
+            Debug.Log($"[TrampolineTrap] Collision hit player '{player.name}'; push={impulseForce}.", player);
         }
     }
 
-    private void toggleSound(bool status)
+    private void playSound()
     {
-        if (bumperSound == null)
+        if (trampolineSound == null)
         {
             return;
         }
 
-        if (status)
+        if (NetworkAssetsManager.Instance == null)
         {
-            bumperSound.Play();
+            trampolineSound.Play();
+            return;
         }
-        else
-        {
-            bumperSound.Stop();
-        }
+
+        NetworkAssetsManager.Instance.PlayForEveryone(trampolineSound);
     }
 }
