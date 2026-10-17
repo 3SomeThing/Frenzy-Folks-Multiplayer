@@ -51,11 +51,9 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
             }
             else
             {
-                Rigidbody playerRigidbody = other.attachedRigidbody;
-                SUPERCharacterAIO playerController = other.GetComponent<SUPERCharacterAIO>();
-                Debug.Log("Not spawned");
-                if (playerRigidbody != null && !playerRigidbody.isKinematic && !playerController)
-                    playerRigidbody.AddForce(transform.forward * pushForce, ForceMode.Impulse);
+Rigidbody playerRigidbody = other.attachedRigidbody;
+if (playerRigidbody != null && !playerRigidbody.isKinematic)
+    playerRigidbody.AddForce(transform.forward * pushForce, ForceMode.Impulse);
             }
 
             Despawn();
