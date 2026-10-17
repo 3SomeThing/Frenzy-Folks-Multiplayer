@@ -139,6 +139,19 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
             }
         }
 
+        private void OnTriggerStay(Collider other)
+        {
+            if (IsSpawned && !IsServer)
+                return;
+
+            if (other.CompareTag("Player") &&
+                States.TryGetValue(CurrentState, out var state) &&
+                state is TurretState turretState)
+            {
+                turretState.OnTargetStay(other);
+            }
+        }
+
         private void OnTriggerExit(Collider other)
         {
             if (IsSpawned && !IsServer)

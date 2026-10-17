@@ -15,5 +15,6 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
 
         public virtual void OnTargetEntered(Collider other) { }
         public virtual void OnTargetLeft(Collider other) { }
+        public virtual void OnTargetStay(Collider other) { }
     }
 }

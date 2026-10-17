@@ -52,10 +52,10 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
             float angle = Mathf.Sin((Time.time - _sweepStartTime) * sweepSpeed) * sweepAngle;
             Fsm.turretHead.transform.localRotation = Quaternion.Euler(0f, angle + _initialAngle, 0f);
         }
-        
-        public override void OnTargetEntered(Collider other)
+
+        public override void OnTargetStay(Collider other)
         {
-            base.OnTargetEntered(other);
+            base.OnTargetStay(other);
             Debug.Log("Attacking player!");
             if (!other.CompareTag("Player")) return;
             Fsm.targetTransform = other.transform;
