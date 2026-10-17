@@ -42,6 +42,7 @@ if (Fsm.FireRate <= 0f || _fireTime >= 1f / Fsm.FireRate)
                     Fsm.ProjectilePrefab,
                     Fsm.FirePoint.position,
                     projectileRotation);
+                
 
                 TurretProjectile turretProjectile = projectile.GetComponent<TurretProjectile>();
                 if (!turretProjectile)

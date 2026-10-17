@@ -9,6 +9,7 @@ TagManager:
   - Obstacle
   - Obstcales
   - Ground
+  - Turret
   layers:
   - Default
   - TransparentFX

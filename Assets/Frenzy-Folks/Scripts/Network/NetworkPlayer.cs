@@ -143,6 +143,19 @@ public class NetworkPlayer : NetworkBehaviour
             previousPlatformWorldToLocal = platform.transform.worldToLocalMatrix;
             return;
         }
+
+        Vector3 localPlayerPosition =
+            previousPlatformWorldToLocal.MultiplyPoint3x4(transform.position);
+        Vector3 carriedPosition = platform.transform.TransformPoint(localPlayerPosition);
+        Vector3 platformDelta = carriedPosition - transform.position;
+        previousPlatformWorldToLocal = platform.transform.worldToLocalMatrix;
+
+        if (platformDelta.sqrMagnitude > 0f)
+        {
+            _rigidbody.MovePosition(_rigidbody.position + platformDelta);
+        }
+    }
+    
     [Rpc(SendTo.Owner)]
     public void ApplyKnockbackRpc(Vector3 force)
     {
@@ -159,111 +172,5 @@ public class NetworkPlayer : NetworkBehaviour
         
         playerController.Jump(playerController.jumpPower);
         playerRigidbody.AddForce(force, ForceMode.Impulse);
-    }
-
-    // private void FixedUpdate()
-    // {
-    //     if (!IsSpawned)
-    //     {
-    //         return;
-    //     }
-    //
-    //     if (IsOwner && !IsServer)
-    //     {
-    //         CarryWithPlatform();
-    //         return;
-    //     }
-    //
-    //     if (!IsServer || IsOwner)
-    //     {
-    //         return;
-    //     }
-    //
-    //     double now = NetworkManager.ServerTime.Time;
-    //     float elapsed = Mathf.Max((float)(now - lastValidationTime), Time.fixedDeltaTime);
-    //     Vector3 position = transform.position;
-    //     Vector3 displacement = position - lastValidatedPosition;
-    //     float platformSpeed = GetGroundPlatformSpeed();
-    //     float horizontalLimit = (characterController.MaxNetworkMovementSpeed + platformSpeed) * elapsed
-    //         + serverPositionTolerance;
-    //     float verticalLimit = Mathf.Max(characterController.MaxNetworkJumpSpeed * 2f, 15f) * elapsed
-    //         + serverPositionTolerance;
-    //
-    //     if (new Vector2(displacement.x, displacement.z).magnitude > horizontalLimit
-    //         || Mathf.Abs(displacement.y) > verticalLimit)
-    //     {
-    //         transform.SetPositionAndRotation(lastValidatedPosition, transform.rotation);
-    //         lastValidationTime = now;
-    //         CorrectOwnerPositionRpc(lastValidatedPosition, transform.rotation);
-    //         return;
-    //     }
-    //
-    //     lastValidatedPosition = position;
-    //     lastValidationTime = now;
-    // }
-    //
-    // private void CarryWithPlatform()
-    // {
-    //     float rayLength = characterController.NetworkCapsuleHeight * 0.5f + 0.25f;
-    //     if (!Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, rayLength))
-    //     {
-    //         carriedPlatform = null;
-    //         return;
-    //     }
-    //
-    //     MovablePlatform platform = hit.collider.GetComponentInParent<MovablePlatform>();
-    //     if (platform == null)
-    //     {
-    //         carriedPlatform = null;
-    //         return;
-    //     }
-    //
-    //     if (carriedPlatform != platform)
-    //     {
-    //         carriedPlatform = platform;
-    //         previousPlatformWorldToLocal = platform.transform.worldToLocalMatrix;
-    //         return;
-    //     }
-    //
-    //     Vector3 platformLocalPlayerPosition = previousPlatformWorldToLocal.MultiplyPoint3x4(transform.position);
-    //     Vector3 carriedPosition = platform.transform.TransformPoint(platformLocalPlayerPosition);
-    //     Vector3 platformDelta = carriedPosition - transform.position;
-    //     previousPlatformWorldToLocal = platform.transform.worldToLocalMatrix;
-    //     if (platformDelta.sqrMagnitude > 0f)
-    //     {
-    //         Rigidbody playerRigidbody = GetComponent<Rigidbody>();
-    //         if (playerRigidbody != null)
-    //         {
-    //             playerRigidbody.MovePosition(playerRigidbody.position + platformDelta);
-    //         }
-    //         else
-    //         {
-    //             transform.position = carriedPosition;
-    //         }
-    //     }
-    // }
-    //
-    // private float GetGroundPlatformSpeed()
-    // {
-    //     float rayLength = characterController.NetworkCapsuleHeight + 0.25f;
-    //     if (!Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, rayLength))
-    //     {
-    //         return 0f;
-    //     }
-    //
-    //     MovablePlatform platform = hit.collider.GetComponentInParent<MovablePlatform>();
-    //     return platform ? platform.Speed : 0f;
-    // }
-
-        Vector3 localPlayerPosition =
-            previousPlatformWorldToLocal.MultiplyPoint3x4(transform.position);
-        Vector3 carriedPosition = platform.transform.TransformPoint(localPlayerPosition);
-        Vector3 platformDelta = carriedPosition - transform.position;
-        previousPlatformWorldToLocal = platform.transform.worldToLocalMatrix;
-
-        if (platformDelta.sqrMagnitude > 0f)
-        {
-            _rigidbody.MovePosition(_rigidbody.position + platformDelta);
-        }
     }
 }

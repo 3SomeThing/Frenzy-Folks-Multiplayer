@@ -1,4 +1,5 @@
-﻿using SUPERCharacter;
+﻿using System;
+using SUPERCharacter;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -8,6 +9,8 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
     {
         [SerializeField, Min(0f)] private float lifetime = 2f;
         [SerializeField, Min(0f)] private float pushForce = 50f;
+        
+        [SerializeField] private ParticleSystem impactEffect;
 
         private float _remainingLifetime;
 
@@ -33,9 +36,19 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
         {
             if (IsSpawned && !IsServer)
                 return;
-
-            if (!other.CompareTag("Player"))
+            
+            if(!other.CompareTag("Player"))
+            {
+                if (other.CompareTag("Turret")) return;
+                if (impactEffect != null)
+                {
+                    Debug.Log($"[TurretProjectile] Playing impact effect '{impactEffect.name}' at position {transform.position}.");
+                    NetworkObject impact = Instantiate(impactEffect, transform.position, Quaternion.identity).GetComponent<NetworkObject>();
+                    impact.Spawn();
+                }
+                Despawn();
                 return;
+            }
 
             NetworkPlayer networkPlayer = other.GetComponentInParent<NetworkPlayer>();
             if (IsSpawned)
@@ -51,9 +64,9 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
             }
             else
             {
-Rigidbody playerRigidbody = other.attachedRigidbody;
-if (playerRigidbody != null && !playerRigidbody.isKinematic)
-    playerRigidbody.AddForce(transform.forward * pushForce, ForceMode.Impulse);
+                Rigidbody playerRigidbody = other.attachedRigidbody;
+                if (playerRigidbody != null && !playerRigidbody.isKinematic)
+                    playerRigidbody.AddForce(transform.forward * pushForce, ForceMode.Impulse);
             }
 
             Despawn();

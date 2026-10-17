@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9032296096101299728}
   - component: {fileID: 363037941278949526}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Sound
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -137,15 +137,35 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 970858522683376029, guid: 80bc920729f878f43b98497f9905649f, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 1177363535979297148, guid: 80bc920729f878f43b98497f9905649f, type: 3}
       propertyPath: m_Enabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1575787999093089030, guid: 80bc920729f878f43b98497f9905649f, type: 3}
+      propertyPath: m_Layer
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2900671245750273032, guid: 80bc920729f878f43b98497f9905649f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.233
       objectReference: {fileID: 0}
+    - target: {fileID: 3147544707392230300, guid: 80bc920729f878f43b98497f9905649f, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4225952829606444659, guid: 80bc920729f878f43b98497f9905649f, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5098883135390519353, guid: 80bc920729f878f43b98497f9905649f, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6632416812859053649, guid: 80bc920729f878f43b98497f9905649f, type: 3}
       propertyPath: m_Layer
       value: 2
       objectReference: {fileID: 0}
@@ -208,6 +228,10 @@ PrefabInstance:
     - target: {fileID: 8699438780788548456, guid: 80bc920729f878f43b98497f9905649f, type: 3}
       propertyPath: m_Name
       value: CheckpointFlag
+      objectReference: {fileID: 0}
+    - target: {fileID: 8699438780788548456, guid: 80bc920729f878f43b98497f9905649f, type: 3}
+      propertyPath: m_Layer
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8699438780788548456, guid: 80bc920729f878f43b98497f9905649f, type: 3}
       propertyPath: m_IsActive
@@ -283,6 +307,8 @@ MonoBehaviour:
   checkpointSound: {fileID: 363037941278949526}
   checkpointParticules: {fileID: 673626302443790963}
   cylinder: {fileID: 1106439415229821739}
+  playSoundAndAnimation: 1
+  changeColor: 1
 --- !u!4 &5673462053885647206 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8354544366753741266, guid: 80bc920729f878f43b98497f9905649f, type: 3}
@@ -332,6 +358,10 @@ PrefabInstance:
       propertyPath: playOnAwake
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2388291302154637720, guid: 07a977963523b3b4dbcaa27119f6b469, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 2388291303799690464, guid: 07a977963523b3b4dbcaa27119f6b469, type: 3}
       propertyPath: looping
       value: 0
@@ -339,6 +369,14 @@ PrefabInstance:
     - target: {fileID: 2388291303799690464, guid: 07a977963523b3b4dbcaa27119f6b469, type: 3}
       propertyPath: playOnAwake
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2388291303799690471, guid: 07a977963523b3b4dbcaa27119f6b469, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6532625474614813267, guid: 07a977963523b3b4dbcaa27119f6b469, type: 3}
+      propertyPath: m_Layer
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6532625474614813270, guid: 07a977963523b3b4dbcaa27119f6b469, type: 3}
       propertyPath: looping
@@ -355,6 +393,10 @@ PrefabInstance:
     - target: {fileID: 6532625474870085665, guid: 07a977963523b3b4dbcaa27119f6b469, type: 3}
       propertyPath: m_Name
       value: StarsParticules
+      objectReference: {fileID: 0}
+    - target: {fileID: 6532625474870085665, guid: 07a977963523b3b4dbcaa27119f6b469, type: 3}
+      propertyPath: m_Layer
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6532625474870085666, guid: 07a977963523b3b4dbcaa27119f6b469, type: 3}
       propertyPath: m_LocalScale.x
@@ -424,6 +466,10 @@ PrefabInstance:
       propertyPath: playOnAwake
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6532625475154270252, guid: 07a977963523b3b4dbcaa27119f6b469, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6532625475154270255, guid: 07a977963523b3b4dbcaa27119f6b469, type: 3}
       propertyPath: looping
       value: 0
@@ -451,6 +497,14 @@ PrefabInstance:
     - target: {fileID: 6532625476167473825, guid: 07a977963523b3b4dbcaa27119f6b469, type: 3}
       propertyPath: playOnAwake
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6532625476167473838, guid: 07a977963523b3b4dbcaa27119f6b469, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6532625476368783796, guid: 07a977963523b3b4dbcaa27119f6b469, type: 3}
+      propertyPath: m_Layer
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6532625476368783799, guid: 07a977963523b3b4dbcaa27119f6b469, type: 3}
       propertyPath: looping

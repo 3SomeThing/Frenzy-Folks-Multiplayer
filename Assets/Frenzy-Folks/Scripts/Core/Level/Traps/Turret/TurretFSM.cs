@@ -49,8 +49,8 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
         [SerializeField, Range(0f, 360f)]
         private float lockTolerance = 5f;
         public float LockTolerance => lockTolerance;
-        
-        [Header("Attack")]
+
+        [Header("Attack")] 
         [SerializeField]
         private GameObject projectilePrefab;
         public GameObject ProjectilePrefab => projectilePrefab;
@@ -82,7 +82,10 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
             base.Start();
         }
         
-        void Awake() => ApplyRadius();
+        void Awake()
+        {
+            ApplyRadius();
+        }
 
         public override void OnNetworkSpawn()
         {
