@@ -11,9 +11,14 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
         {
             base.Enter();
 
-            if (Fsm.IsSpawned && !Fsm.IsServer)
+            if (NetworkManager.Singleton != null &&
+                NetworkManager.Singleton.IsClient &&
+                !NetworkManager.Singleton.IsServer)
+            {
+                Fsm.TransitionTo("Targeting");
                 return;
-
+            }
+            
             if (!Fsm.ProjectilePrefab || !Fsm.FirePoint || !Fsm.turretHead || !Fsm.targetTransform)
             {
                 Debug.LogError("[TurretAttackState] Cannot fire: projectile prefab, fire point, turret head, or target is missing.", Fsm);
