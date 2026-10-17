@@ -29,7 +29,7 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
                 return;
             }
 
-            if (_fireTime >= Fsm.FireRate)
+if (Fsm.FireRate <= 0f || _fireTime >= 1f / Fsm.FireRate)
             {
                 _fireTime = 0f;
                 Quaternion projectileRotation = Quaternion.LookRotation(direction);
