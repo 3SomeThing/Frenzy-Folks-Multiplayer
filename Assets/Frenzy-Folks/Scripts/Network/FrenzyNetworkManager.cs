@@ -1,4 +1,5 @@
-﻿using Frenzy_Folks.Scripts.Core;
+﻿using System;
+using Frenzy_Folks.Scripts.Core;
 using Frenzy_Folks.Scripts.Startup;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
