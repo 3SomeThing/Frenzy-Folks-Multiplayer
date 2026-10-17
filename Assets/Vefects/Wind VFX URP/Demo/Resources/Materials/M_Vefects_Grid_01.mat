@@ -50,6 +50,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _AlphaCutoff: 0.5
+    - _Cutoff: 0.5
     - _EnvironmentReflections: 1
     - _MasksTileOverall: 1
     - _NormalIntensity: 2
@@ -60,6 +61,8 @@ Material:
     - _ReceiveShadows: 1
     - _RoughnessMax: 0.3
     - _RoughnessMin: 0.45
+    - _ScreenSpaceReflections: 1
+    - _ScreenSpaceReflectionsContributeTransparent: 1
     - _Specular: 0.01
     - _SpecularHighlights: 1
     - _TextureTileOverall: 1

@@ -47,6 +47,24 @@ public class NetworkPlayer : NetworkBehaviour
         }
     }
 
+    [Rpc(SendTo.Owner)]
+    public void ApplyKnockbackRpc(Vector3 force)
+    {
+        if (!IsOwner)
+            return;
+
+        Rigidbody playerRigidbody = GetComponent<Rigidbody>();
+        SUPERCharacterAIO playerController = GetComponent<SUPERCharacterAIO>();
+        if (playerRigidbody == null || playerRigidbody.isKinematic || playerController == null)
+        {
+            Debug.LogWarning($"[NetworkPlayer] Cannot apply knockback to '{name}': its Rigidbody is missing or kinematic.", this);
+            return;
+        }
+        
+        playerController.Jump(playerController.jumpPower);
+        playerRigidbody.AddForce(force, ForceMode.Impulse);
+    }
+
     // private void FixedUpdate()
     // {
     //     if (!IsSpawned)

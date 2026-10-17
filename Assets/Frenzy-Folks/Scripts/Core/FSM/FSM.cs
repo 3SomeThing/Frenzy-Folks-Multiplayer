@@ -20,16 +20,25 @@ namespace Frenzy_Folks.Scripts.Core.FSM
         }
 
         void Update() {
+            if (IsSpawned && !IsServer)
+                return;
+
             if (CurrentState != string.Empty)
                 States[CurrentState].Update();
         }
 
         void FixedUpdate() {
+            if (IsSpawned && !IsServer)
+                return;
+
             if (CurrentState != string.Empty)
                 States[CurrentState].FixedUpdate();
         }
 
         public void TransitionTo(string state) {
+            if (IsSpawned && !IsServer)
+                return;
+
             if (CurrentState != string.Empty)
                 States[CurrentState].Exit();
             CurrentState = state;

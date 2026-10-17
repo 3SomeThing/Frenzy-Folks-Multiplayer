@@ -10,6 +10,9 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
 {
     public class TurretFSM : FSM
     {
+        private readonly NetworkVariable<Quaternion> _headRotation =
+            new NetworkVariable<Quaternion>(Quaternion.identity);
+
         [SerializeField] public Transform turretHead;
         
         [Header("Idle")]
@@ -58,9 +61,9 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
         private float projectileSpeed = 10f;
         public float ProjectileSpeed => projectileSpeed;
 
-        [SerializeField] 
-        private NetworkVariable<float> projectileForce = new NetworkVariable<float>(50f);
-        public NetworkVariable<float> ProjectileForce => projectileForce;
+        [SerializeField]
+        private float projectileForce = 50f;
+        public float ProjectileForce => projectileForce;
 
         [SerializeField, Tooltip("Number of projectile fired every second")] 
         private float fireRate = 1f;
@@ -79,6 +82,41 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
         
         void Awake() => ApplyRadius();
 
+        public override void OnNetworkSpawn()
+        {
+            _headRotation.OnValueChanged += OnHeadRotationChanged;
+
+            if (IsServer)
+            {
+                _headRotation.Value = turretHead.localRotation;
+            }
+            else
+            {
+                turretHead.localRotation = _headRotation.Value;
+            }
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            _headRotation.OnValueChanged -= OnHeadRotationChanged;
+        }
+
+        private void LateUpdate()
+        {
+            if (!IsSpawned || !IsServer || !turretHead)
+                return;
+
+            Quaternion currentRotation = turretHead.localRotation;
+            if (Quaternion.Angle(_headRotation.Value, currentRotation) > 0.05f)
+                _headRotation.Value = currentRotation;
+        }
+
+        private void OnHeadRotationChanged(Quaternion previousRotation, Quaternion newRotation)
+        {
+            if (!IsServer && turretHead)
+                turretHead.localRotation = newRotation;
+        }
+
         void ApplyRadius()
         {
             if (detectionCollider != null)
@@ -88,6 +126,9 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
         
         private void OnTriggerEnter(Collider other)
         {
+            if (IsSpawned && !IsServer)
+                return;
+
             if (other.CompareTag("Player") &&
                 States.TryGetValue(CurrentState, out var state) &&
                 state is TurretState turretState)
@@ -98,6 +139,9 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
 
         private void OnTriggerExit(Collider other)
         {
+            if (IsSpawned && !IsServer)
+                return;
+
             if (other.CompareTag("Player") &&
                 States.TryGetValue(CurrentState, out var state) &&
                 state is TurretState turretState)
