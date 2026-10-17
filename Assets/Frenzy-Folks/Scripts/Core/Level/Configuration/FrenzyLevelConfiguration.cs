@@ -16,6 +16,26 @@ public class FrenzyLevelConfiguration
         {
             key = "movable_platform",
             value = new MovablePlatformConfiguration()
+        },
+        new ConfigurationEntry
+        {
+            key = "checkpoint",
+            value = new CheckpointConfiguration()
+        },
+        new ConfigurationEntry
+        {
+            key = "fan_trap",
+            value = new FanTrapConfiguration()
+        },
+        new ConfigurationEntry
+        {
+            key = "trampoline_trap",
+            value = new TrampolineTrapConfiguration()
+        },        
+        new ConfigurationEntry
+        {
+            key = "bumper_trap",
+            value = new BumperTrapConfiguration()
         }
     };
 

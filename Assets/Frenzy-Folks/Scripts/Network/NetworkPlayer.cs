@@ -6,7 +6,6 @@ using UnityEngine;
 public class NetworkPlayer : NetworkBehaviour
 {
     [SerializeField] private List<GameObject> localOnlyObjects = new();
-    [SerializeField, Min(0f)] private float serverPositionTolerance = 0.2f;
 
     private SUPERCharacterAIO characterController;
     private Vector3 lastValidatedPosition;
@@ -15,22 +14,23 @@ public class NetworkPlayer : NetworkBehaviour
     private Matrix4x4 previousPlatformWorldToLocal;
 
     private Rigidbody _rigidbody;
+    private CapsuleCollider _capsuleCollider;
+    private readonly NetworkVariable<bool> isRespawning = new(
+        false,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server);
 
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
+        _capsuleCollider = GetComponent<CapsuleCollider>();
     }
 
     public override void OnNetworkSpawn()
     {
         characterController = GetComponent<SUPERCharacterAIO>();
-        characterController.enabled = IsOwner;
-
-        Rigidbody playerRigidbody = GetComponent<Rigidbody>();
-        if (playerRigidbody != null)
-        {
-            playerRigidbody.isKinematic = !IsOwner;
-        }
+        isRespawning.OnValueChanged += OnRespawningChanged;
+        ApplyRespawningState(isRespawning.Value);
 
         if (IsServer)
         {
@@ -47,6 +47,102 @@ public class NetworkPlayer : NetworkBehaviour
         }
     }
 
+    public override void OnNetworkDespawn()
+    {
+        isRespawning.OnValueChanged -= OnRespawningChanged;
+    }
+
+    public void SetRespawning(bool respawning)
+    {
+        if (!IsServer)
+        {
+            return;
+        }
+
+        isRespawning.Value = respawning;
+        ApplyRespawningState(respawning);
+    }
+
+    public void RespawnAt(Vector3 position, Quaternion rotation)
+    {
+        if (!IsServer)
+        {
+            return;
+        }
+
+        ApplyRespawnPosition(position, rotation);
+        RespawnAtOwnerRpc(position, rotation);
+    }
+
+    [Rpc(SendTo.Owner)]
+    private void RespawnAtOwnerRpc(Vector3 position, Quaternion rotation)
+    {
+        ApplyRespawnPosition(position, rotation);
+    }
+
+    private void ApplyRespawnPosition(Vector3 position, Quaternion rotation)
+    {
+        transform.SetPositionAndRotation(position, rotation);
+
+        if (_rigidbody != null)
+        {
+            _rigidbody.position = position;
+            _rigidbody.rotation = rotation;
+            _rigidbody.linearVelocity = Vector3.zero;
+            _rigidbody.angularVelocity = Vector3.zero;
+        }
+    }
+
+    private void OnRespawningChanged(bool previousValue, bool currentValue)
+    {
+        ApplyRespawningState(currentValue);
+    }
+
+    private void ApplyRespawningState(bool respawning)
+    {
+        if (characterController != null)
+        {
+            characterController.enabled = IsOwner && !respawning;
+        }
+
+        if (_rigidbody != null)
+        {
+            _rigidbody.isKinematic = !IsOwner || respawning;
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (!IsSpawned || !IsOwner || IsServer)
+        {
+            return;
+        }
+
+        CarryWithPlatform();
+    }
+
+    private void CarryWithPlatform()
+    {
+        float rayLength = (_capsuleCollider ? _capsuleCollider.height : 1f) * 0.5f + 0.25f;
+        if (!Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, rayLength))
+        {
+            carriedPlatform = null;
+            return;
+        }
+
+        MovablePlatform platform = hit.collider.GetComponentInParent<MovablePlatform>();
+        if (platform is null)
+        {
+            carriedPlatform = null;
+            return;
+        }
+
+        if (carriedPlatform != platform)
+        {
+            carriedPlatform = platform;
+            previousPlatformWorldToLocal = platform.transform.worldToLocalMatrix;
+            return;
+        }
     [Rpc(SendTo.Owner)]
     public void ApplyKnockbackRpc(Vector3 force)
     {
@@ -159,27 +255,15 @@ public class NetworkPlayer : NetworkBehaviour
     //     return platform ? platform.Speed : 0f;
     // }
 
-    // [Rpc(SendTo.Owner)]
-    // private void CorrectOwnerPositionRpc(Vector3 position, Quaternion rotation)
-    // {
-    //     if (!IsOwner)
-    //     {
-    //         return;
-    //     }
-    //
-    //     transform.SetPositionAndRotation(position, rotation);
-    //     Rigidbody playerRigidbody = GetComponent<Rigidbody>();
-    //     if (playerRigidbody)
-    //     {
-    //         playerRigidbody.position = position;
-    //         playerRigidbody.rotation = rotation;
-    //         playerRigidbody.linearVelocity = Vector3.zero;
-    //     }
-    // }
-    //
-    // [Rpc(SendTo.Owner)]
-    // public void MovePositionClientRpc(Vector3 move)
-    // {
-    //     _rigidbody.MovePosition(move);
-    // }
+        Vector3 localPlayerPosition =
+            previousPlatformWorldToLocal.MultiplyPoint3x4(transform.position);
+        Vector3 carriedPosition = platform.transform.TransformPoint(localPlayerPosition);
+        Vector3 platformDelta = carriedPosition - transform.position;
+        previousPlatformWorldToLocal = platform.transform.worldToLocalMatrix;
+
+        if (platformDelta.sqrMagnitude > 0f)
+        {
+            _rigidbody.MovePosition(_rigidbody.position + platformDelta);
+        }
+    }
 }

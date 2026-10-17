@@ -32,7 +32,7 @@ public class ServerEventHandler : MonoBehaviour
     public void OnServerStarted()
     {
         _networkManager.SceneManager.OnLoadEventCompleted += OnSceneLoadedComplete;
-        _networkManager.SceneManager.LoadScene("Level", LoadSceneMode.Single);
+        _networkManager.SceneManager.LoadScene("TestingPlayground", LoadSceneMode.Single);
     }
 
     private void CheckApprovalCallback(
