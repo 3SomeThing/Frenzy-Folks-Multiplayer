@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 7175f337114658048b5ae70cc9a13c44
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 141013
+  packageName: FloatingPlantPots
+  packageVersion: 2.0
+  assetPath: Assets/@PaulosCreations/FloatingPots/Demo/DemoController.cs
+  uploadId: 344820

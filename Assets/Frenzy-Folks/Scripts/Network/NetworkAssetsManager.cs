@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -36,6 +37,16 @@ public class NetworkAssetsManager : NetworkBehaviour
         PlayAssetForEveryone(particles, true);
     }
 
+    public void StopForEveryone(AudioSource source)
+    {
+        StopAssetForEveryone(source, false);
+    }
+
+    public void StopForEveryone(ParticleSystem particles)
+    {
+        StopAssetForEveryone(particles, true);
+    }
+
     public void SetActiveForEveryone(GameObject target, bool active)
     {
         if (target == null)
@@ -44,7 +55,7 @@ public class NetworkAssetsManager : NetworkBehaviour
         }
 
         NetworkObject sourceObject = target.GetComponentInParent<NetworkObject>();
-        if (sourceObject == null || !sourceObject.IsSpawned)
+        if (!sourceObject || !sourceObject.IsSpawned)
         {
             target.SetActive(active);
             return;
@@ -63,7 +74,71 @@ public class NetworkAssetsManager : NetworkBehaviour
         }
     }
 
+    public void SetEnabledForEveryone(Behaviour target, bool enabled)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        NetworkObject sourceObject = target.GetComponentInParent<NetworkObject>();
+        if (!sourceObject || !sourceObject.IsSpawned)
+        {
+            target.enabled = enabled;
+            return;
+        }
+
+        NetworkObjectReference sourceReference = new NetworkObjectReference(sourceObject);
+        string sourcePath = GetRelativePath(sourceObject.transform, target.transform);
+        int behaviourIndex = GetBehaviourIndex(target);
+
+        if (IsServer)
+        {
+            SetEnabledForEveryoneClientRpc(sourceReference, sourcePath, behaviourIndex, enabled);
+        }
+        else
+        {
+            SetEnabledForEveryoneServerRpc(sourceReference, sourcePath, behaviourIndex, enabled);
+        }
+    }
+
     private void PlayAssetForEveryone(Component asset, bool isParticleSystem)
+    {
+        if (!asset)
+        {
+            return;
+        }
+
+        NetworkObject sourceObject = asset.GetComponentInParent<NetworkObject>();
+        if (!IsSpawned || (!IsServer && !IsClient))
+        {
+            PlayAssetLocally(asset, isParticleSystem);
+            return;
+        }
+
+        NetworkObjectReference sourceReference = default;
+        string sourcePath;
+        if (sourceObject && sourceObject.IsSpawned)
+        {
+            sourceReference = new NetworkObjectReference(sourceObject);
+            sourcePath = GetRelativePath(sourceObject.transform, asset.transform);
+        }
+        else
+        {
+            sourcePath = GetHierarchyPath(asset.transform);
+        }
+
+        if (IsServer)
+        {
+            PlayForEveryoneClientRpc(sourceReference, sourcePath, isParticleSystem);
+        }
+        else
+        {
+            PlayForEveryoneServerRpc(sourceReference, sourcePath, isParticleSystem);
+        }
+    }
+
+    private void StopAssetForEveryone(Component asset, bool isParticleSystem)
     {
         if (asset == null)
         {
@@ -73,7 +148,7 @@ public class NetworkAssetsManager : NetworkBehaviour
         NetworkObject sourceObject = asset.GetComponentInParent<NetworkObject>();
         if (!IsSpawned || (!IsServer && !IsClient))
         {
-            PlayAssetLocally(asset, isParticleSystem);
+            StopAssetLocally(asset, isParticleSystem);
             return;
         }
 
@@ -91,11 +166,11 @@ public class NetworkAssetsManager : NetworkBehaviour
 
         if (IsServer)
         {
-            PlayForEveryoneClientRpc(sourceReference, sourcePath, isParticleSystem);
+            StopForEveryoneClientRpc(sourceReference, sourcePath, isParticleSystem);
         }
         else
         {
-            PlayForEveryoneServerRpc(sourceReference, sourcePath, isParticleSystem);
+            StopForEveryoneServerRpc(sourceReference, sourcePath, isParticleSystem);
         }
     }
 
@@ -124,6 +199,30 @@ public class NetworkAssetsManager : NetworkBehaviour
     }
 
     [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+    private void StopForEveryoneServerRpc(
+        NetworkObjectReference sourceReference,
+        string sourcePath,
+        bool isParticleSystem)
+    {
+        if (TryGetAsset(sourceReference, sourcePath, isParticleSystem, out _))
+        {
+            StopForEveryoneClientRpc(sourceReference, sourcePath, isParticleSystem);
+        }
+    }
+
+    [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
+    private void StopForEveryoneClientRpc(
+        NetworkObjectReference sourceReference,
+        string sourcePath,
+        bool isParticleSystem)
+    {
+        if (TryGetAsset(sourceReference, sourcePath, isParticleSystem, out Component asset))
+        {
+            StopAssetLocally(asset, isParticleSystem);
+        }
+    }
+
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     private void SetActiveForEveryoneServerRpc(
         NetworkObjectReference sourceReference,
         string sourcePath,
@@ -144,6 +243,32 @@ public class NetworkAssetsManager : NetworkBehaviour
         if (TryGetTarget(sourceReference, sourcePath, out GameObject target))
         {
             target.SetActive(active);
+        }
+    }
+
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+    private void SetEnabledForEveryoneServerRpc(
+        NetworkObjectReference sourceReference,
+        string sourcePath,
+        int behaviourIndex,
+        bool enabled)
+    {
+        if (TryGetBehaviour(sourceReference, sourcePath, behaviourIndex, out _))
+        {
+            SetEnabledForEveryoneClientRpc(sourceReference, sourcePath, behaviourIndex, enabled);
+        }
+    }
+
+    [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
+    private void SetEnabledForEveryoneClientRpc(
+        NetworkObjectReference sourceReference,
+        string sourcePath,
+        int behaviourIndex,
+        bool enabled)
+    {
+        if (TryGetBehaviour(sourceReference, sourcePath, behaviourIndex, out Behaviour target))
+        {
+            target.enabled = enabled;
         }
     }
 
@@ -176,7 +301,7 @@ public class NetworkAssetsManager : NetworkBehaviour
         out Component asset)
     {
         asset = null;
-        if (target == null)
+        if (!target)
         {
             return false;
         }
@@ -207,6 +332,57 @@ public class NetworkAssetsManager : NetworkBehaviour
         return target != null;
     }
 
+    private static bool TryGetBehaviour(
+        NetworkObjectReference sourceReference,
+        string sourcePath,
+        int behaviourIndex,
+        out Behaviour target)
+    {
+        target = null;
+
+        if (sourceReference.TryGet(out NetworkObject sourceObject))
+        {
+            Transform sourceTransform = string.IsNullOrEmpty(sourcePath)
+                ? sourceObject.transform
+                : FindBySiblingPath(sourceObject.transform, sourcePath);
+
+            return TryGetBehaviour(sourceTransform, behaviourIndex, out target);
+        }
+
+        return TryGetBehaviour(
+            FindSceneObjectBySiblingPath(sourcePath),
+            behaviourIndex,
+            out target);
+    }
+
+    private static bool TryGetBehaviour(
+        Transform targetTransform,
+        int behaviourIndex,
+        out Behaviour target)
+    {
+        Behaviour[] behaviours = targetTransform != null
+            ? targetTransform.GetComponents<Behaviour>()
+            : System.Array.Empty<Behaviour>();
+        target = behaviourIndex >= 0 && behaviourIndex < behaviours.Length
+            ? behaviours[behaviourIndex]
+            : null;
+        return target != null;
+    }
+
+    private static int GetBehaviourIndex(Behaviour target)
+    {
+        Behaviour[] behaviours = target.GetComponents<Behaviour>();
+        for (int index = 0; index < behaviours.Length; index++)
+        {
+            if (behaviours[index] == target)
+            {
+                return index;
+            }
+        }
+
+        return -1;
+    }
+
     private static void PlayAssetLocally(Component asset, bool isParticleSystem)
     {
         if (isParticleSystem)
@@ -219,6 +395,18 @@ public class NetworkAssetsManager : NetworkBehaviour
         }
     }
 
+    private static void StopAssetLocally(Component asset, bool isParticleSystem)
+    {
+        if (isParticleSystem)
+        {
+            ((ParticleSystem)asset).Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        }
+        else
+        {
+            ((AudioSource)asset).Stop();
+        }
+    }
+
     private static string GetRelativePath(Transform root, Transform target)
     {
         if (root == target)
@@ -226,11 +414,11 @@ public class NetworkAssetsManager : NetworkBehaviour
             return string.Empty;
         }
 
-        System.Collections.Generic.List<int> pathParts =
-            new System.Collections.Generic.List<int>();
+        List<int> pathParts =
+            new();
         Transform current = target;
 
-        while (current != null && current != root)
+        while (current && current != root)
         {
             pathParts.Add(current.GetSiblingIndex());
             current = current.parent;
@@ -247,18 +435,18 @@ public class NetworkAssetsManager : NetworkBehaviour
 
     private static string GetHierarchyPath(Transform target)
     {
-        System.Collections.Generic.List<int> pathParts =
-            new System.Collections.Generic.List<int>();
+        List<int> pathParts =
+            new List<int>();
         Transform current = target;
 
-        while (current != null && current.parent != null)
+        while (current && current.parent)
         {
             pathParts.Add(current.GetSiblingIndex());
             current = current.parent;
         }
 
         pathParts.Reverse();
-        return current == null
+        return !current
             ? string.Empty
             : current.name + "|" + string.Join("/", pathParts);
     }
@@ -313,7 +501,7 @@ public class NetworkAssetsManager : NetworkBehaviour
             }
         }
 
-        if (current == null)
+        if (!current)
         {
             return null;
         }

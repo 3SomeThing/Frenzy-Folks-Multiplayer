@@ -8,6 +8,7 @@ using UnityEngine;
 public class FrenzyNetworkManager : MonoBehaviour
 {
     [SerializeField] private GameState gameState;
+    [SerializeField] private NetworkAssetsManager networkAssetsManager;
     [SerializeField] private ServerEventHandler serverEventHandlerPrefab;
 
     private ServerEventHandler _serverEventHandler;

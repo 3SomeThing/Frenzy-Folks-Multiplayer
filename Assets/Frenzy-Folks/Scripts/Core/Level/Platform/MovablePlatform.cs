@@ -7,6 +7,8 @@ public class MovablePlatform : NetworkBehaviour
 {
     [SerializeField] private float speed = 5f;
     [SerializeField] private float pauseDuration = 1f;
+    [SerializeField] private bool smoothMovement = true;
+    [SerializeField, Min(0.01f)] private float smoothTime = 0.15f;
 
     public float Speed => speed;
 
@@ -20,6 +22,7 @@ public class MovablePlatform : NetworkBehaviour
     private Rigidbody _body;
     private Vector3 _lastObservedPos;
     private bool _hasObserved;
+    private Vector3 _smoothVelocity;
 
     // Server (or offline) drives the movement, clients only observe it
     private bool HasAuthority => !IsSpawned || IsServer;
@@ -36,6 +39,7 @@ public class MovablePlatform : NetworkBehaviour
         pathPoints.AddRange(points);
         _currentPathIndex = 0;
         _pauseTimer = 0f;
+        _smoothVelocity = Vector3.zero;
     }
 
     private void FixedUpdate()
@@ -56,12 +60,27 @@ public class MovablePlatform : NetworkBehaviour
         {
             _pauseTimer -= Time.fixedDeltaTime;
             Velocity = Vector3.zero;
+            _smoothVelocity = Vector3.zero;
             return;
         }
 
         Vector3 current = _body.position;
         Vector3 target = pathPoints[_currentPathIndex];
-        Vector3 next = Vector3.MoveTowards(current, target, speed * Time.fixedDeltaTime);
+        Vector3 next = smoothMovement
+            ? Vector3.SmoothDamp(
+                current,
+                target,
+                ref _smoothVelocity,
+                smoothTime,
+                speed,
+                Time.fixedDeltaTime)
+            : Vector3.MoveTowards(current, target, speed * Time.fixedDeltaTime);
+
+        if ((next - target).sqrMagnitude < 0.0001f)
+        {
+            next = target;
+            _smoothVelocity = Vector3.zero;
+        }
 
         Velocity = (next - current) / Time.fixedDeltaTime;
         _body.MovePosition(next);

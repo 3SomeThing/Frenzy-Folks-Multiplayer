@@ -239,6 +239,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Frenzy_Folks.Scripts.Network.FrenzyNetworkManager
   gameState: {fileID: 894803207}
+  networkAssetsManager: {fileID: 178586064}
   serverEventHandlerPrefab: {fileID: 2904118224704008743, guid: 5718a6cb0511bb043a6abb2c69fdd98a, type: 3}
 --- !u!1 &178586061
 GameObject:
@@ -252,7 +253,7 @@ GameObject:
   - component: {fileID: 178586062}
   - component: {fileID: 178586064}
   m_Layer: 0
-  m_Name: AudioSource
+  m_Name: NetworkAssetsManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

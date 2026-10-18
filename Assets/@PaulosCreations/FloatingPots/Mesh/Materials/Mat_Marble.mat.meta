@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 6260e037d20dd5c42b9223fc49e159c1
+timeCreated: 1577185511
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 141013
+  packageName: FloatingPlantPots
+  packageVersion: 2.0
+  assetPath: Assets/@PaulosCreations/FloatingPots/Mesh/Materials/Mat_Marble.mat
+  uploadId: 344820
