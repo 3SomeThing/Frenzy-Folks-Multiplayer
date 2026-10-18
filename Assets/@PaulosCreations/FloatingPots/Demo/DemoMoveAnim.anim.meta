@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: b42af77896854fd42a4f33c881a17933
+timeCreated: 1577187246
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 141013
+  packageName: FloatingPlantPots
+  packageVersion: 2.0
+  assetPath: Assets/@PaulosCreations/FloatingPots/Demo/DemoMoveAnim.anim
+  uploadId: 344820

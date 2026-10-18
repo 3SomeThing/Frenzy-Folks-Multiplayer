@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 770dc274b5a4e4d43ac4fdff34351cb4
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 141013
+  packageName: FloatingPlantPots
+  packageVersion: 2.0
+  assetPath: Assets/@PaulosCreations/FloatingPots/Demo/Light_Moving.controller
+  uploadId: 344820

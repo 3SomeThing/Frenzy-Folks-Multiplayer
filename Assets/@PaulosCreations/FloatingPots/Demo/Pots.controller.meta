@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: cea4394474c45c0489549ac62f7f5f0d
+timeCreated: 1577187246
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 141013
+  packageName: FloatingPlantPots
+  packageVersion: 2.0
+  assetPath: Assets/@PaulosCreations/FloatingPots/Demo/Pots.controller
+  uploadId: 344820
