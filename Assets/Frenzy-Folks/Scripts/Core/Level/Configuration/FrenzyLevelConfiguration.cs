@@ -36,7 +36,12 @@ public class FrenzyLevelConfiguration
         {
             key = "bumper_trap",
             value = new BumperTrapConfiguration()
-        }
+        },
+        new ConfigurationEntry
+        {
+            key = "platform",
+            value = new PlatformConfiguration()
+        },
     };
 
     public FrenzyLevelConfiguration(FrenzyLevel parent)
