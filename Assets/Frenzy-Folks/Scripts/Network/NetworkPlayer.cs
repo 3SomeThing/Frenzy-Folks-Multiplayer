@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using SUPERCharacter;
 using Unity.Netcode;
@@ -15,6 +16,8 @@ public class NetworkPlayer : NetworkBehaviour
 
     private Rigidbody _rigidbody;
     private CapsuleCollider _capsuleCollider;
+    private Collider[] _colliders;
+    private bool collisionsEnabled = true;
     private readonly NetworkVariable<bool> isRespawning = new(
         false,
         NetworkVariableReadPermission.Everyone,
@@ -24,13 +27,17 @@ public class NetworkPlayer : NetworkBehaviour
     {
         _rigidbody = GetComponent<Rigidbody>();
         _capsuleCollider = GetComponent<CapsuleCollider>();
+        _colliders = GetComponentsInChildren<Collider>(true);
     }
 
     public override void OnNetworkSpawn()
     {
         characterController = GetComponent<SUPERCharacterAIO>();
+        AlignOwnerCameraToPlayerRotation();
         isRespawning.OnValueChanged += OnRespawningChanged;
+        isMovementLocked.OnValueChanged += OnMovementLockedChanged;
         ApplyRespawningState(isRespawning.Value);
+        ApplyMovementLockedState(isMovementLocked.Value);
 
         if (IsServer)
         {
@@ -44,12 +51,104 @@ public class NetworkPlayer : NetworkBehaviour
             {
                 localOnlyObject.SetActive(true);
             }
+
+            AssignWorldCanvasCamera();
+        }
+    }
+
+    private void AssignWorldCanvasCamera()
+    {
+        if (characterController == null || characterController.playerCamera == null)
+        {
+            return;
+        }
+
+        Canvas[] canvases = FindObjectsByType<Canvas>();
+        foreach (Canvas canvas in canvases)
+        {
+            if (canvas.renderMode == RenderMode.WorldSpace)
+            {
+                canvas.worldCamera = characterController.playerCamera;
+            }
         }
     }
 
     public override void OnNetworkDespawn()
     {
         isRespawning.OnValueChanged -= OnRespawningChanged;
+        isMovementLocked.OnValueChanged -= OnMovementLockedChanged;
+    }
+
+    private readonly NetworkVariable<bool> isMovementLocked = new(
+        false,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server);
+
+    public void SetMovementLocked(bool locked)
+    {
+        if (!IsServer)
+        {
+            return;
+        }
+
+        isMovementLocked.Value = locked;
+        ApplyMovementLockedState(locked);
+    }
+
+    [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
+    private void SetCollisionsEnabledRpc(bool enabled)
+    {
+        collisionsEnabled = enabled;
+        ApplyCollisionsEnabled(enabled && !isMovementLocked.Value);
+    }
+
+    public void SetPlayerLayerCollisionIgnored(bool ignored)
+    {
+        if (!IsServer)
+        {
+            return;
+        }
+
+        ApplyPlayerLayerCollisionIgnored(ignored);
+        SetPlayerLayerCollisionIgnoredRpc(ignored);
+    }
+
+    [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
+    private void SetPlayerLayerCollisionIgnoredRpc(bool ignored)
+    {
+        ApplyPlayerLayerCollisionIgnored(ignored);
+    }
+
+    private void ApplyPlayerLayerCollisionIgnored(bool ignored)
+    {
+        int playerLayer = LayerMask.NameToLayer("Player");
+        if (playerLayer >= 0)
+        {
+            Physics.IgnoreLayerCollision(playerLayer, playerLayer, ignored);
+        }
+    }
+
+    private void ApplyCollisionsEnabled(bool enabled)
+    {
+        if (_colliders == null)
+        {
+            return;
+        }
+
+        foreach (Collider collider in _colliders)
+        {
+            collider.enabled = enabled;
+        }
+    }
+
+    public bool IsInside(BoxCollider zone)
+    {
+        Vector3 localPosition = zone.transform.InverseTransformPoint(transform.position);
+        Vector3 halfSize = zone.size * 0.5f;
+        Vector3 offset = localPosition - zone.center;
+        return Mathf.Abs(offset.x) <= halfSize.x &&
+               Mathf.Abs(offset.y) <= halfSize.y &&
+               Mathf.Abs(offset.z) <= halfSize.z;
     }
 
     public void SetRespawning(bool respawning)
@@ -74,22 +173,36 @@ public class NetworkPlayer : NetworkBehaviour
         RespawnAtOwnerRpc(position, rotation);
     }
 
+    private void ApplyRespawnPosition(Vector3 position, Quaternion rotation)
+    {
+        transform.SetPositionAndRotation(position, rotation);
+
+        if (_rigidbody)
+        {
+            _rigidbody.position = position;
+            _rigidbody.rotation = rotation;
+            _rigidbody.linearVelocity = Vector3.zero;
+            if (!_rigidbody.isKinematic)
+            {
+                _rigidbody.angularVelocity = Vector3.zero;
+            }
+        }
+
+        AlignOwnerCameraToPlayerRotation();
+    }
+
     [Rpc(SendTo.Owner)]
     private void RespawnAtOwnerRpc(Vector3 position, Quaternion rotation)
     {
         ApplyRespawnPosition(position, rotation);
     }
 
-    private void ApplyRespawnPosition(Vector3 position, Quaternion rotation)
+    public void AlignOwnerCameraToPlayerRotation()
     {
-        transform.SetPositionAndRotation(position, rotation);
-
-        if (_rigidbody != null)
+        if (IsOwner && characterController != null && characterController.playerCamera != null)
         {
-            _rigidbody.position = position;
-            _rigidbody.rotation = rotation;
-            _rigidbody.linearVelocity = Vector3.zero;
-            _rigidbody.angularVelocity = Vector3.zero;
+            characterController.RotateView(transform.rotation.eulerAngles, false);
+            characterController.RefreshCameraPosition();
         }
     }
 
@@ -102,12 +215,43 @@ public class NetworkPlayer : NetworkBehaviour
     {
         if (characterController != null)
         {
-            characterController.enabled = IsOwner && !respawning;
+            characterController.enabled = IsOwner && !respawning && !isMovementLocked.Value;
         }
 
         if (_rigidbody != null)
         {
-            _rigidbody.isKinematic = !IsOwner || respawning;
+            _rigidbody.isKinematic = !IsOwner || respawning || isMovementLocked.Value;
+        }
+    }
+
+    private void OnMovementLockedChanged(bool previousValue, bool currentValue)
+    {
+        ApplyMovementLockedState(currentValue);
+    }
+
+    private void ApplyMovementLockedState(bool locked)
+    {
+        if (characterController != null && !isRespawning.Value)
+        {
+            characterController.enabled = IsOwner && !locked;
+        }
+
+        if (_rigidbody != null && !isRespawning.Value)
+        {
+            _rigidbody.isKinematic = !IsOwner || locked;
+            if (locked)
+            {
+                _rigidbody.linearVelocity = Vector3.zero;
+                if (!_rigidbody.isKinematic)
+                {
+                    _rigidbody.angularVelocity = Vector3.zero;
+                }
+            }
+        }
+
+        if (_colliders != null)
+        {
+            ApplyCollisionsEnabled(collisionsEnabled && !locked);
         }
     }
 
