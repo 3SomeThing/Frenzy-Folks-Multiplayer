@@ -9,6 +9,9 @@ public class Checkpoint : NetworkBehaviour
     private static int nextCheckpointIndex;
     private static readonly Dictionary<int, Checkpoint> checkpoints =
         new Dictionary<int, Checkpoint>();
+    private static readonly List<Checkpoint> registeredCheckpoints =
+        new List<Checkpoint>();
+    private static int localReachedCheckpointIndex = -1;
 
     [SerializeField] public int checkpointIndex;
 
@@ -29,6 +32,8 @@ public class Checkpoint : NetworkBehaviour
     {
         nextCheckpointIndex = 0;
         checkpoints.Clear();
+        registeredCheckpoints.Clear();
+        localReachedCheckpointIndex = -1;
     }
 
     private void Awake()
@@ -45,17 +50,45 @@ public class Checkpoint : NetworkBehaviour
             checkpointIndex = nextCheckpointIndex;
         }
 
-        nextCheckpointIndex = Mathf.Max(nextCheckpointIndex, checkpointIndex + 1);
-        checkpoints[checkpointIndex] = this;
+        RefreshRegistration();
     }
 
     private void OnDestroy()
     {
-        if (checkpoints.TryGetValue(checkpointIndex, out Checkpoint checkpoint) &&
-            checkpoint == this)
+        RemoveRegistrations();
+    }
+
+    public void RefreshRegistration()
+    {
+        RemoveRegistrations();
+
+        nextCheckpointIndex = Mathf.Max(nextCheckpointIndex, checkpointIndex + 1);
+        checkpoints[checkpointIndex] = this;
+        registeredCheckpoints.Add(this);
+
+        if (checkpointIndex <= localReachedCheckpointIndex)
         {
-            checkpoints.Remove(checkpointIndex);
+            SetColor();
         }
+    }
+
+    private void RemoveRegistrations()
+    {
+        List<int> registrationsToRemove = new List<int>();
+        foreach (KeyValuePair<int, Checkpoint> registration in checkpoints)
+        {
+            if (registration.Value == this)
+            {
+                registrationsToRemove.Add(registration.Key);
+            }
+        }
+
+        foreach (int registration in registrationsToRemove)
+        {
+            checkpoints.Remove(registration);
+        }
+
+        registeredCheckpoints.Remove(this);
     }
 
     public static bool TryGetByIndex(int index, out Checkpoint checkpoint)
@@ -75,35 +108,41 @@ public class Checkpoint : NetworkBehaviour
             player = other.GetComponentInParent<NetworkPlayer>();
         }
 
-        if (player == null || GameState.Instance == null)
+        if (player == null ||
+            GameState.Instance == null ||
+            NetworkManager.Singleton == null ||
+            !NetworkManager.Singleton.IsServer)
         {
             return;
         }
 
-        bool hasCheckpoint = GameState.Instance.usersLastCheckpoint.TryGetValue(
-            player.OwnerClientId,
-            out int userLastCheckpointIndex);
+        GameState.Instance.InitializePlayerCheckpoint(player.OwnerClientId);
+        int userLastCheckpointIndex =
+            GameState.Instance.usersLastCheckpoint[player.OwnerClientId];
 
-        if (!hasCheckpoint || checkpointIndex > userLastCheckpointIndex)
+        if (checkpointIndex > userLastCheckpointIndex)
         {
-            bool isServer = NetworkManager.Singleton != null &&
-                            IsServer;
+            GameState.Instance.SetCheckpoint(
+                player.OwnerClientId,
+                checkpointIndex,
+                this);
+            PlaySoundAndAnimation();
+            player.ApplyCheckpointColorRpc(checkpointIndex);
+        }
+    }
 
-            if (isServer)
-            {
-                GameState.Instance.SetCheckpoint(player.OwnerClientId, checkpointIndex);
-                PlaySoundAndAnimation();
-            }
+    public static void ApplyColorsUpTo(int reachedCheckpointIndex)
+    {
+        localReachedCheckpointIndex = Mathf.Max(
+            localReachedCheckpointIndex,
+            reachedCheckpointIndex);
 
-            if (player.IsOwner)
+        foreach (Checkpoint checkpoint in registeredCheckpoints)
+        {
+            if (checkpoint != null &&
+                checkpoint.checkpointIndex <= localReachedCheckpointIndex)
             {
-                foreach (Checkpoint checkpoint in checkpoints.Values)
-                {
-                    if (checkpoint.checkpointIndex <= checkpointIndex)
-                    {
-                        checkpoint.SetColor();
-                    }
-                }
+                checkpoint.SetColor();
             }
         }
     }

@@ -7,6 +7,7 @@ public class CheckpointConfiguration : LevelElementConfiguration<Checkpoint, Che
     public override void Apply(Checkpoint target)
     {
         target.checkpointIndex = checkpointIndex;
+        target.RefreshRegistration();
     }
 
     public override CheckpointConfiguration From(Checkpoint source)

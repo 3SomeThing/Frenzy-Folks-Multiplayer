@@ -9,6 +9,8 @@ namespace Frenzy_Folks.Scripts.Core
         
         public readonly Dictionary<ulong, int> usersLastCheckpoint =
             new Dictionary<ulong, int>();
+        private readonly Dictionary<ulong, Checkpoint> playerCheckpoints =
+            new Dictionary<ulong, Checkpoint>();
         
         private NetworkVariable<bool> _lockJoining = new NetworkVariable<bool>(false,
             NetworkVariableReadPermission.Everyone,
@@ -50,21 +52,33 @@ namespace Frenzy_Folks.Scripts.Core
             // Do something
         }
 
-        public void SetCheckpoint(ulong playerId, int checkpointIndex)
+        public void SetCheckpoint(
+            ulong playerId,
+            int checkpointIndex,
+            Checkpoint checkpoint)
         {
             usersLastCheckpoint[playerId] = checkpointIndex;
+            playerCheckpoints[playerId] = checkpoint;
+        }
+
+        public void InitializePlayerCheckpoint(ulong playerId)
+        {
+            if (!usersLastCheckpoint.ContainsKey(playerId))
+            {
+                usersLastCheckpoint[playerId] = -1;
+            }
         }
 
         public bool TryGetPlayerCheckpoint(ulong playerId, out Checkpoint checkpoint)
         {
-            checkpoint = null;
-
-            if (!usersLastCheckpoint.TryGetValue(playerId, out int checkpointIndex))
+            if (playerCheckpoints.TryGetValue(playerId, out checkpoint) &&
+                checkpoint != null)
             {
-                return false;
+                return true;
             }
 
-            return Checkpoint.TryGetByIndex(checkpointIndex, out checkpoint);
+            checkpoint = null;
+            return false;
         }
     }
 }

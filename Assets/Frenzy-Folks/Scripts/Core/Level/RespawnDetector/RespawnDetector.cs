@@ -75,14 +75,17 @@ public class RespawnDetector : MonoBehaviour
 
         if (player && checkpoint)
         {
-            player.RespawnAt(checkpoint.transform.position, checkpoint.transform.rotation);
+            Vector3 position = checkpoint.transform.position;
+            position.y += 1;
+            
+            player.RespawnAt(position, checkpoint.transform.rotation);
         }
         
         if (characterController && characterRigidbody)
         {
             GameObject character = player.gameObject.transform.Find("Character").gameObject;
-            NetworkAssetsManager.Instance.SetActiveForEveryone(character, true);
             player.SetRespawning(false);
+            NetworkAssetsManager.Instance.SetActiveForEveryone(character, true);
         }
 
         respawningPlayers.Remove(player);
