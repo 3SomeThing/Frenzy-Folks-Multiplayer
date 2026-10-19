@@ -1,63 +1,108 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Unity.Netcode;
+using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 [Serializable]
 public class FrenzyLevelConfiguration
 {
-    private readonly FrenzyLevel _parent;
+    private readonly FrenzyLevel _parentLevel;
+
+    private static readonly Dictionary<string, Func<BaseConfigurationSerializable>> ConfigurationDefinitions = new()
+    {
+        {
+            "movable_platform",
+            () => new MovablePlatformConfiguration()
+        },
+        {
+            "checkpoint",
+            () => new CheckpointConfiguration()
+        },
+        {
+            "fan_trap",
+            () => new FanTrapConfiguration()
+        },
+        {
+            "trampoline_trap",
+            () => new TrampolineTrapConfiguration()
+        },
+        {
+            "bumper_trap",
+            () => new BumperTrapConfiguration()
+        },
+        {
+            "platform",
+            () => new PlatformConfiguration()
+        },
+        {
+            "turret_trap",
+            () => new TurretTrapConfiguration()
+        }
+    };
+    
+    private static readonly string LevelsPath = Path.Combine(Application.streamingAssetsPath, "Levels");
 
     [SerializeField]
-    private List<ConfigurationEntry> configurationEntries = new()
-    {
-        new ConfigurationEntry
-        {
-            key = "movable_platform",
-            value = new MovablePlatformConfiguration()
-        },
-        new ConfigurationEntry
-        {
-            key = "checkpoint",
-            value = new CheckpointConfiguration()
-        },
-        new ConfigurationEntry
-        {
-            key = "fan_trap",
-            value = new FanTrapConfiguration()
-        },
-        new ConfigurationEntry
-        {
-            key = "trampoline_trap",
-            value = new TrampolineTrapConfiguration()
-        },        
-        new ConfigurationEntry
-        {
-            key = "bumper_trap",
-            value = new BumperTrapConfiguration()
-        },
-        new ConfigurationEntry
-        {
-            key = "platform",
-            value = new PlatformConfiguration()
-        },
-    };
+    private List<ConfigurationEntry> configurationEntries = new();
 
-    public FrenzyLevelConfiguration(FrenzyLevel parent)
+    public FrenzyLevelConfiguration(FrenzyLevel parentLevel)
     {
-        _parent = parent;
+        _parentLevel = parentLevel;
+        
+        if(!Directory.Exists(LevelsPath))
+        {
+            Directory.CreateDirectory(LevelsPath);
+        }
     }
     
     // private Dictionary<string, BaseConfigurationSerializable> configurations;
 
-    public FrenzyLevelConfiguration Save()
+    public FrenzyLevelConfiguration SaveLevelToFile(string levelName = "test-level.json")
     {
-        // configurations = new Dictionary<string, BaseConfigurationSerializable>();
-        // foreach (ConfigurationEntry entry in configurationEntries)
-        //     configurations.Add(entry.key, entry.value);
+        configurationEntries.Clear();
+        
+        Debug.Log("Saving level elements...");
+        Debug.Log("Prefabs count: " + _parentLevel.levelPrefabs.Count);
+        
+        List<GameObject> serializedElements = new List<GameObject>();
+            
+        foreach (SerializedLevelElement levelElement in _parentLevel.transform.GetComponentsInChildren<SerializedLevelElement>())
+        {
+            if (!levelElement.gameObject || serializedElements.Contains(levelElement.gameObject)) continue;
+                
+            serializedElements.Add(levelElement.gameObject);
+                
+            Debug.Log(levelElement.name);
+                
+            // Get the key for the current prefab
+            bool exists = ConfigurationDefinitions.TryGetValue(levelElement.elementName, out Func<BaseConfigurationSerializable> value);
 
-        Debug.Log(JsonUtility.ToJson(this, true));
+            Debug.Log("Processing prefab with key: " + levelElement.elementName + ", exists: " + exists);
+            if (!exists)
+            {
+                Debug.LogWarning($"No configuration entry found for key: {levelElement.elementName}");
+                continue;
+            }
+
+            BaseConfigurationSerializable configuration = value.Invoke();
+            configuration.From(levelElement.gameObject);
+            configurationEntries.Add(new ConfigurationEntry
+            {
+                key = levelElement.elementName,
+                value = configuration
+            });
+        }
+
+        Debug.Log("Configuration entries count: " + configurationEntries.Count);
+        Debug.Log("Serialized elements count: " + serializedElements.Count);
+
+        string path = Path.Combine(LevelsPath, levelName);
+        File.WriteAllText(path, JsonUtility.ToJson(this, true));
 
         return this;
     }
@@ -65,32 +110,32 @@ public class FrenzyLevelConfiguration
     public void AddToLevel<T>(ConfigurationEntry entry, GameObject prefab)
     where T : BaseConfigurationSerializable
     {
-        GameObject instance = Object.Instantiate(prefab, _parent.transform, true);
+        GameObject instance = Object.Instantiate(prefab, _parentLevel.transform, true);
         ((T)entry.value).Apply(instance);
 
         NetworkObject networkObject = instance.GetComponent<NetworkObject>();
         networkObject.Spawn(true);
-        networkObject.TrySetParent(_parent.transform);
+        networkObject.TrySetParent(_parentLevel.transform);
+    }
+
+    public void Load(string json)
+    {
+        JsonUtility.FromJsonOverwrite(json, this);
+
+        Debug.Log("Configuration entries count: " + configurationEntries.Count);
+        
+        foreach (ConfigurationEntry configurationEntry in configurationEntries)
+        {
+            AddToLevel<BaseConfigurationSerializable>(configurationEntry, _parentLevel.levelPrefabs[configurationEntry.key]);
+        }
     }
     
-    public static FrenzyLevelConfiguration Load(FrenzyLevel level, string json, Dictionary<string, GameObject> prefabs)
+    public static FrenzyLevelConfiguration Load(FrenzyLevel level, string levelName, Dictionary<string, GameObject> prefabs)
     {
         Debug.Log("Loading level elements...");
+        string json = File.ReadAllText(Path.Combine(LevelsPath, levelName));
         FrenzyLevelConfiguration frenzyLevelConfiguration = new FrenzyLevelConfiguration(level);
-        JsonUtility.FromJsonOverwrite(json, frenzyLevelConfiguration);
-        
-        foreach (ConfigurationEntry configurationEntry in frenzyLevelConfiguration.configurationEntries)
-        {
-            switch (configurationEntry.key)
-            {
-                case "movable_platform": 
-                    frenzyLevelConfiguration.AddToLevel<MovablePlatformConfiguration>(configurationEntry, prefabs[configurationEntry.key]);
-                    break;
-            }
-        }
-
-        // Debug.Log(frenzyLevelConfiguration.configurationEntries[0].value.transform);
-
+        frenzyLevelConfiguration.Load(json);
         return frenzyLevelConfiguration;
     }
 }

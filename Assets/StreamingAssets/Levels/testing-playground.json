@@ -1,0 +1,459 @@
+{
+    "configurationEntries": [
+        {
+            "key": "fan_trap",
+            "value": {
+                "rid": 1000
+            }
+        },
+        {
+            "key": "fan_trap",
+            "value": {
+                "rid": 1001
+            }
+        },
+        {
+            "key": "bumper_trap",
+            "value": {
+                "rid": 1002
+            }
+        },
+        {
+            "key": "trampoline_trap",
+            "value": {
+                "rid": 1003
+            }
+        },
+        {
+            "key": "turret_trap",
+            "value": {
+                "rid": 1004
+            }
+        },
+        {
+            "key": "checkpoint",
+            "value": {
+                "rid": 1005
+            }
+        },
+        {
+            "key": "checkpoint",
+            "value": {
+                "rid": 1006
+            }
+        },
+        {
+            "key": "movable_platform",
+            "value": {
+                "rid": 1007
+            }
+        },
+        {
+            "key": "platform",
+            "value": {
+                "rid": 1008
+            }
+        },
+        {
+            "key": "platform",
+            "value": {
+                "rid": 1009
+            }
+        },
+        {
+            "key": "platform",
+            "value": {
+                "rid": 1010
+            }
+        },
+        {
+            "key": "platform",
+            "value": {
+                "rid": 1011
+            }
+        }
+    ],
+    "references": {
+        "version": 2,
+        "RefIds": [
+            {
+                "rid": 1000,
+                "type": {
+                    "class": "FanTrapConfiguration",
+                    "ns": "",
+                    "asm": "Assembly-CSharp"
+                },
+                "data": {
+                    "name": "",
+                    "transform": {
+                        "position": {
+                            "x": 29.34320068359375,
+                            "y": 1.74399995803833,
+                            "z": 28.855321884155273
+                        },
+                        "rotation": {
+                            "x": 0.0,
+                            "y": 0.36058545112609863,
+                            "z": 0.0,
+                            "w": 0.9327262043952942
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    },
+                    "pushSpeed": 100.0,
+                    "blowingDuration": 7.0,
+                    "pauseDuration": 0.10000000149011612,
+                    "sweepAngle": 45.0
+                }
+            },
+            {
+                "rid": 1001,
+                "type": {
+                    "class": "FanTrapConfiguration",
+                    "ns": "",
+                    "asm": "Assembly-CSharp"
+                },
+                "data": {
+                    "name": "",
+                    "transform": {
+                        "position": {
+                            "x": 20.84000015258789,
+                            "y": 1.74399995803833,
+                            "z": 30.200000762939453
+                        },
+                        "rotation": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0,
+                            "w": 1.0
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    },
+                    "pushSpeed": 100.0,
+                    "blowingDuration": 7.0,
+                    "pauseDuration": 5.0,
+                    "sweepAngle": 0.0
+                }
+            },
+            {
+                "rid": 1002,
+                "type": {
+                    "class": "BumperTrapConfiguration",
+                    "ns": "",
+                    "asm": "Assembly-CSharp"
+                },
+                "data": {
+                    "name": "",
+                    "transform": {
+                        "position": {
+                            "x": 12.99258041381836,
+                            "y": 0.5,
+                            "z": 32.17744064331055
+                        },
+                        "rotation": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0,
+                            "w": 1.0
+                        },
+                        "scale": {
+                            "x": 4.960000038146973,
+                            "y": 4.960000038146973,
+                            "z": 4.960000038146973
+                        }
+                    },
+                    "pushSpeedHorizontal": 30.0,
+                    "pushSpeedVertical": 3.0
+                }
+            },
+            {
+                "rid": 1003,
+                "type": {
+                    "class": "TrampolineTrapConfiguration",
+                    "ns": "",
+                    "asm": "Assembly-CSharp"
+                },
+                "data": {
+                    "name": "",
+                    "transform": {
+                        "position": {
+                            "x": 5.7645416259765625,
+                            "y": 0.5,
+                            "z": 31.686607360839844
+                        },
+                        "rotation": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0,
+                            "w": 1.0
+                        },
+                        "scale": {
+                            "x": 9.0,
+                            "y": 9.0,
+                            "z": 9.0
+                        }
+                    },
+                    "pushSpeedVertical": 30.0
+                }
+            },
+            {
+                "rid": 1004,
+                "type": {
+                    "class": "TurretTrapConfiguration",
+                    "ns": "",
+                    "asm": "Assembly-CSharp"
+                },
+                "data": {
+                    "name": "",
+                    "transform": {
+                        "position": {
+                            "x": 42.11000061035156,
+                            "y": 0.5,
+                            "z": 28.420000076293945
+                        },
+                        "rotation": {
+                            "x": 0.0,
+                            "y": -0.9991105198860168,
+                            "z": 0.0,
+                            "w": -0.042168501764535904
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    },
+                    "fireRate": 1.0,
+                    "targetingSpeed": 5,
+                    "detectionRadius": 10.0
+                }
+            },
+            {
+                "rid": 1005,
+                "type": {
+                    "class": "CheckpointConfiguration",
+                    "ns": "",
+                    "asm": "Assembly-CSharp"
+                },
+                "data": {
+                    "name": "",
+                    "transform": {
+                        "position": {
+                            "x": -1.1075725555419922,
+                            "y": 0.5,
+                            "z": 31.326614379882813
+                        },
+                        "rotation": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0,
+                            "w": 1.0
+                        },
+                        "scale": {
+                            "x": 2.5999999046325684,
+                            "y": 2.5999999046325684,
+                            "z": 2.5999999046325684
+                        }
+                    },
+                    "checkpointIndex": 1
+                }
+            },
+            {
+                "rid": 1006,
+                "type": {
+                    "class": "CheckpointConfiguration",
+                    "ns": "",
+                    "asm": "Assembly-CSharp"
+                },
+                "data": {
+                    "name": "",
+                    "transform": {
+                        "position": {
+                            "x": -5.615962982177734,
+                            "y": 0.5,
+                            "z": 31.06012535095215
+                        },
+                        "rotation": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0,
+                            "w": 1.0
+                        },
+                        "scale": {
+                            "x": 2.5999999046325684,
+                            "y": 2.5999999046325684,
+                            "z": 2.5999999046325684
+                        }
+                    },
+                    "checkpointIndex": 2
+                }
+            },
+            {
+                "rid": 1007,
+                "type": {
+                    "class": "MovablePlatformConfiguration",
+                    "ns": "",
+                    "asm": "Assembly-CSharp"
+                },
+                "data": {
+                    "name": "",
+                    "transform": {
+                        "position": {
+                            "x": -14.191450119018555,
+                            "y": 1.25,
+                            "z": 33.9422607421875
+                        },
+                        "rotation": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0,
+                            "w": 1.0
+                        },
+                        "scale": {
+                            "x": 1.25,
+                            "y": 1.0,
+                            "z": 1.25
+                        }
+                    },
+                    "speed": 5.0,
+                    "pathPoints": []
+                }
+            },
+            {
+                "rid": 1008,
+                "type": {
+                    "class": "PlatformConfiguration",
+                    "ns": "",
+                    "asm": "Assembly-CSharp"
+                },
+                "data": {
+                    "name": "",
+                    "transform": {
+                        "position": {
+                            "x": -20.534099578857422,
+                            "y": 0.5,
+                            "z": 34.28791046142578
+                        },
+                        "rotation": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0,
+                            "w": 1.0
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    },
+                    "makePlatformFall": true,
+                    "delayBeforeFalling": 2.0,
+                    "delayBeforeRespawning": 3.0
+                }
+            },
+            {
+                "rid": 1009,
+                "type": {
+                    "class": "PlatformConfiguration",
+                    "ns": "",
+                    "asm": "Assembly-CSharp"
+                },
+                "data": {
+                    "name": "",
+                    "transform": {
+                        "position": {
+                            "x": -26.034099578857422,
+                            "y": 16.8700008392334,
+                            "z": 34.28791046142578
+                        },
+                        "rotation": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0,
+                            "w": 1.0
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    },
+                    "makePlatformFall": true,
+                    "delayBeforeFalling": 2.0,
+                    "delayBeforeRespawning": 3.0
+                }
+            },
+            {
+                "rid": 1010,
+                "type": {
+                    "class": "PlatformConfiguration",
+                    "ns": "",
+                    "asm": "Assembly-CSharp"
+                },
+                "data": {
+                    "name": "",
+                    "transform": {
+                        "position": {
+                            "x": -20.534099578857422,
+                            "y": 1.75,
+                            "z": 39.03791046142578
+                        },
+                        "rotation": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0,
+                            "w": 1.0
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    },
+                    "makePlatformFall": true,
+                    "delayBeforeFalling": 2.0,
+                    "delayBeforeRespawning": 3.0
+                }
+            },
+            {
+                "rid": 1011,
+                "type": {
+                    "class": "PlatformConfiguration",
+                    "ns": "",
+                    "asm": "Assembly-CSharp"
+                },
+                "data": {
+                    "name": "",
+                    "transform": {
+                        "position": {
+                            "x": -20.534099578857422,
+                            "y": 2.5,
+                            "z": 43.78791046142578
+                        },
+                        "rotation": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0,
+                            "w": 1.0
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    },
+                    "makePlatformFall": true,
+                    "delayBeforeFalling": 2.0,
+                    "delayBeforeRespawning": 3.0
+                }
+            }
+        ]
+    }
+}

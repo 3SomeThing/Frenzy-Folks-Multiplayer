@@ -42,6 +42,11 @@ public class MovablePlatform : NetworkBehaviour
         _smoothVelocity = Vector3.zero;
     }
 
+    public List<Vector3> GetPathPoints()
+    {
+        return pathPoints;
+    }
+
     private void FixedUpdate()
     {
         if (HasAuthority) ServerStep();

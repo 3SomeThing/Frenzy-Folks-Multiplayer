@@ -16,6 +16,8 @@ public class MovablePlatformConfiguration : LevelElementConfiguration<MovablePla
 
     public override MovablePlatformConfiguration From(MovablePlatform source)
     {
-        throw new System.NotImplementedException();
+        speed = source.Speed;
+        pathPoints = source.GetPathPoints();
+        return this;
     }
 }

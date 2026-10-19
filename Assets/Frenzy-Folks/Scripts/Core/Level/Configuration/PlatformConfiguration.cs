@@ -8,11 +8,16 @@ public class PlatformConfiguration : LevelElementConfiguration<Platform, Platfor
 
     public override void Apply(Platform target)
     {
-        throw new System.NotImplementedException();
+        target.makePlatformFall = makePlatformFall;
+        target.delayBeforeFalling = delayBeforeFalling;
+        target.delayBeforeRespawning = delayBeforeRespawning;
     }
 
     public override PlatformConfiguration From(Platform source)
     {
-        throw new System.NotImplementedException();
+        makePlatformFall = source.makePlatformFall;
+        delayBeforeFalling = source.delayBeforeFalling;
+        delayBeforeRespawning = source.delayBeforeRespawning;
+        return this;
     }
 }

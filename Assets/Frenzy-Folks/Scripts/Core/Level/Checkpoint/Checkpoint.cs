@@ -10,7 +10,7 @@ public class Checkpoint : MonoBehaviour
     private static readonly Dictionary<int, Checkpoint> checkpoints =
         new Dictionary<int, Checkpoint>();
 
-    [SerializeField] private int checkpointIndex;
+    [SerializeField] public int checkpointIndex;
 
     [SerializeField] private AudioSource checkpointSound;
     [SerializeField] private ParticleSystem checkpointParticules;

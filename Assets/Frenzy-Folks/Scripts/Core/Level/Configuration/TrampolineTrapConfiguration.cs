@@ -2,15 +2,16 @@
 
 public class TrampolineTrapConfiguration : LevelElementConfiguration<TrampolineTrap, TrampolineTrapConfiguration>
 {
-    [SerializeField, Min(0f)] public float pushSpeedVertical = 30f;
+    [SerializeField, Min(0f)] private float pushSpeedVertical = 30f;
     
     public override void Apply(TrampolineTrap trampoline)
     {
-        throw new System.NotImplementedException();
+        trampoline.pushSpeedVertical = pushSpeedVertical;
     }
 
     public override TrampolineTrapConfiguration From(TrampolineTrap source)
     {
-        throw new System.NotImplementedException();
+        pushSpeedVertical = source.pushSpeedVertical;
+        return this;
     }
 }

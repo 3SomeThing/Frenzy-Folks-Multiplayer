@@ -21,6 +21,7 @@ public abstract class LevelElementConfiguration<TLevelElement, TConfiguration>
 
     public sealed override BaseConfigurationSerializable From(GameObject source)
     {
+        transform = new SerializableTransform().From(source.transform);
         return From(GetLevelElement(source));
     }
 

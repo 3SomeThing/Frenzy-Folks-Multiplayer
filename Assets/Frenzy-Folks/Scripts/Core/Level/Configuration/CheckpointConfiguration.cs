@@ -6,11 +6,12 @@ public class CheckpointConfiguration : LevelElementConfiguration<Checkpoint, Che
     
     public override void Apply(Checkpoint target)
     {
-        throw new System.NotImplementedException();
+        target.checkpointIndex = checkpointIndex;
     }
 
     public override CheckpointConfiguration From(Checkpoint source)
     {
-        throw new System.NotImplementedException();
+        checkpointIndex = source.checkpointIndex;
+        return this;
     }
 }
