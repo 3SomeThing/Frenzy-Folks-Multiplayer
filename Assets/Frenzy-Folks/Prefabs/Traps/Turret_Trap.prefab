@@ -211,6 +211,7 @@ GameObject:
   - component: {fileID: 8009436725251616360}
   - component: {fileID: 2356671201030524628}
   - component: {fileID: 6371936232858552073}
+  - component: {fileID: 5822536103008014314}
   m_Layer: 2
   m_Name: Turret_Trap
   m_TagString: Turret
@@ -357,6 +358,19 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &5822536103008014314
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5670505714895977808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c62d563adc674bc4983c52ebc4624b0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SerializedLevelElement
+  elementName: turret_trap
 --- !u!1 &7130438860629149374
 GameObject:
   m_ObjectHideFlags: 0

@@ -6,9 +6,9 @@ using UnityEngine.UIElements;
 [RequireComponent(typeof(Rigidbody))]
 public class Platform : NetworkBehaviour
 {
-    [SerializeField] private bool makePlatformFall = false;
-    [SerializeField] private float delayBeforeFalling = 2f;
-    [SerializeField] private float delayBeforeRespawning = 3f;
+    [SerializeField] public bool makePlatformFall = false;
+    [SerializeField] public float delayBeforeFalling = 2f;
+    [SerializeField] public float delayBeforeRespawning = 3f;
 
     [SerializeField] private AudioSource _crumbleSound;
     [SerializeField] private ParticleSystem _crumbleParticles;

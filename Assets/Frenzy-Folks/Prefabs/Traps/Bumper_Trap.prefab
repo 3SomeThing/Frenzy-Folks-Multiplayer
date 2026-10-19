@@ -92,6 +92,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6525973169812466031, guid: a65279c4fad7ab448813d9e259e9a3b9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1606544936482879469}
+    - targetCorrespondingSourceObject: {fileID: 6525973169812466031, guid: a65279c4fad7ab448813d9e259e9a3b9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3905085655548420479}
   m_SourcePrefab: {fileID: 100100000, guid: a65279c4fad7ab448813d9e259e9a3b9, type: 3}
 --- !u!1 &3892407871355116576 stripped
 GameObject:
@@ -286,3 +289,16 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &3905085655548420479
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3892407871355116576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c62d563adc674bc4983c52ebc4624b0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SerializedLevelElement
+  elementName: bumper_trap

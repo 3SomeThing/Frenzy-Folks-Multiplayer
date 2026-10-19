@@ -2,16 +2,19 @@
 
 public class BumperTrapConfiguration : LevelElementConfiguration<BumperTrap, BumperTrapConfiguration>
 {
-    [SerializeField, Min(0f)] public float pushSpeedHorizontal = 30f;
-    [SerializeField, Min(0f)] public float pushSpeedVertical = 100f;
+    [SerializeField, Min(0f)] private float pushSpeedHorizontal = 30f;
+    [SerializeField, Min(0f)] private float pushSpeedVertical = 100f;
     
     public override void Apply(BumperTrap target)
     {
-        throw new System.NotImplementedException();
+        target.pushSpeedHorizontal = pushSpeedHorizontal;
+        target.pushSpeedVertical = pushSpeedVertical;
     }
 
     public override BumperTrapConfiguration From(BumperTrap source)
     {
-        throw new System.NotImplementedException();
+        pushSpeedHorizontal = source.pushSpeedHorizontal;
+        pushSpeedVertical = source.pushSpeedVertical;
+        return this;
     }
 }

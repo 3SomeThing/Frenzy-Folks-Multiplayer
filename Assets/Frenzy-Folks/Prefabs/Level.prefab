@@ -1,0 +1,90 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8975398503276253350
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 978818195162614054}
+  - component: {fileID: 7132563377794156483}
+  - component: {fileID: 107378429012416364}
+  m_Layer: 0
+  m_Name: Level
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &978818195162614054
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8975398503276253350}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7132563377794156483
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8975398503276253350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 2866189753
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  m_InScenePlacedDisabledByDefault: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  m_InScenePlaced: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &107378429012416364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8975398503276253350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49482cefdf5846ccad272076452c2cda, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FrenzyLevel
+  ShowTopMostFoldoutHeaderGroup: 1
+  levelPrefabs:
+  - key: movable_platform
+    value: {fileID: 7454710114694620191, guid: ebf15ae7831ca6744b38b3b5ba992a8e, type: 3}
+  - key: checkpoint
+    value: {fileID: 5041778689137918940, guid: a1507cd1dac7b0f48965da7d1d87daf3, type: 3}
+  - key: fan_trap
+    value: {fileID: 1492757247803485592, guid: ca4dcd90535833e4b9c1b504a4949942, type: 3}
+  - key: trampoline_trap
+    value: {fileID: 1604028399946519275, guid: 67396de68288f2c4c86efc5c30cd344b, type: 3}
+  - key: bumper_trap
+    value: {fileID: 3892407871355116576, guid: 36cfc372d2968aa4aad7054f07bb3a91, type: 3}
+  - key: platform
+    value: {fileID: 5424937700218060980, guid: 64b48effd5a8e4b43a07ea50661a5f62, type: 3}
+  - key: turret_trap
+    value: {fileID: 5670505714895977808, guid: 65523869d5709b7319445039dad12aa2, type: 3}

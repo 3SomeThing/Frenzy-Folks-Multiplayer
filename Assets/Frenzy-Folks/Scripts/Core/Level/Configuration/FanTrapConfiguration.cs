@@ -9,12 +9,19 @@ public class FanTrapConfiguration : LevelElementConfiguration<FanTrap, FanTrapCo
     
     public override void Apply(FanTrap target)
     {
-        throw new System.NotImplementedException();
+        target.pushSpeed = pushSpeed;
+        target.blowingDuration = blowingDuration;
+        target.pauseDuration = pauseDuration;
+        target.sweepAngle = sweepAngle;
     }
 
     public override FanTrapConfiguration From(FanTrap source)
     {
-        throw new System.NotImplementedException();
+        pushSpeed = source.pushSpeed;
+        blowingDuration = source.blowingDuration;
+        pauseDuration = source.pauseDuration;
+        sweepAngle = source.sweepAngle;
+        return this;
     }
 }
  
