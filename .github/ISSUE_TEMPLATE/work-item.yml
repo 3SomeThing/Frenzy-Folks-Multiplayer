@@ -1,0 +1,105 @@
+name: Work item
+description: Feature or task with requirements, specs, tests and risks
+title: "[Work item]: "
+labels: ["needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Fill in every section. Write "N/A" rather than leaving one blank.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary & user story
+      description: What and why, in 2-3 sentences.
+      placeholder: "As a gym coach, I want to export the attendance list as CSV so that I can send it to the federation."
+    validations:
+      required: true
+
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Requirements
+      description: What the solution must do (functional) and how well (non-functional).
+      value: |
+        **Functional**
+        - [ ] FR-1:
+        **Non-functional** (performance, security, accessibility...)
+        - [ ] NFR-1:
+    validations:
+      required: true
+
+  - type: textarea
+    id: specifications
+    attributes:
+      label: Specifications
+      description: How it will be built. Endpoints, data model, UI, libraries.
+      placeholder: |
+        - Route: GET /api/attendance/export?format=csv
+        - New column `exported_at` on `attendances`
+        - Auth: role `coach` only
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Testable statements, ideally Given / When / Then.
+      value: |
+        - [ ] Given ..., when ..., then ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: tests
+    attributes:
+      label: Test plan
+      value: |
+        - [ ] Unit:
+        - [ ] Integration / feature:
+        - [ ] Manual / edge cases:
+    validations:
+      required: true
+
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks & mitigations
+      description: One risk per line with likelihood / impact and what you'll do about it.
+      placeholder: |
+        - Large exports time out (Likelihood: Med, Impact: High) -> queue the job
+        - Personal data in CSV (Likelihood: Low, Impact: High) -> restrict by role
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies & assumptions
+      placeholder: "Blocked by #12. Assumes the members table is already normalized."
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options: ["P0 - Critical", "P1 - High", "P2 - Medium", "P3 - Low"]
+    validations:
+      required: true
+
+  - type: dropdown
+    id: size
+    attributes:
+      label: Estimate
+      options: ["XS (< 2h)", "S (half day)", "M (1-2 days)", "L (3-5 days)", "XL (split it)"]
+
+  - type: checkboxes
+    id: dod
+    attributes:
+      label: Definition of done
+      options:
+        - label: Code reviewed and merged
+        - label: Tests written and passing in CI
+        - label: Documentation updated
+        - label: Deployed and verified
