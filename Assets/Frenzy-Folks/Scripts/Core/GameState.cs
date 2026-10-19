@@ -9,6 +9,22 @@ namespace Frenzy_Folks.Scripts.Core
         
         public readonly Dictionary<ulong, int> usersLastCheckpoint =
             new Dictionary<ulong, int>();
+        
+        private NetworkVariable<bool> _lockJoining = new NetworkVariable<bool>(false,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server);
+        
+        public bool LockJoining
+        {
+            get
+            {
+                return _lockJoining.Value;
+            }
+            set
+            {
+                _lockJoining.Value = value;
+            }
+        }
 
         public void Awake()
         {

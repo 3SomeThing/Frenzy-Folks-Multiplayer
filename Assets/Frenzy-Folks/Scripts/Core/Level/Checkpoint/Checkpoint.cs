@@ -4,7 +4,7 @@ using Frenzy_Folks.Scripts.Network;
 using Unity.Netcode;
 using UnityEngine;
 
-public class Checkpoint : MonoBehaviour
+public class Checkpoint : NetworkBehaviour
 {
     private static int nextCheckpointIndex;
     private static readonly Dictionary<int, Checkpoint> checkpoints =
@@ -27,7 +27,7 @@ public class Checkpoint : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetIndex()
     {
-        nextCheckpointIndex = 1;
+        nextCheckpointIndex = 0;
         checkpoints.Clear();
     }
 
@@ -35,7 +35,7 @@ public class Checkpoint : MonoBehaviour
     {        
         block = new MaterialPropertyBlock();
         
-        if (checkpointIndex <= 0)
+        if (checkpointIndex < 0)
         {
             while (checkpoints.ContainsKey(nextCheckpointIndex))
             {
@@ -63,12 +63,7 @@ public class Checkpoint : MonoBehaviour
         return checkpoints.TryGetValue(index, out checkpoint);
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        RegisterPlayer(other);
-    }
-
-    private void OnTriggerStay(Collider other)
+    public void OnTriggerEnter(Collider other)
     {
         RegisterPlayer(other);
     }
@@ -92,7 +87,7 @@ public class Checkpoint : MonoBehaviour
         if (!hasCheckpoint || checkpointIndex > userLastCheckpointIndex)
         {
             bool isServer = NetworkManager.Singleton != null &&
-                            NetworkManager.Singleton.IsServer;
+                            IsServer;
 
             if (isServer)
             {

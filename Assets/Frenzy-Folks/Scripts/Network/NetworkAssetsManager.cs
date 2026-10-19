@@ -74,6 +74,23 @@ public class NetworkAssetsManager : NetworkBehaviour
         }
     }
 
+    public void SetActiveForEachPlayer(string gameObjectName, bool active)
+    {
+        if (string.IsNullOrWhiteSpace(gameObjectName))
+        {
+            return;
+        }
+
+        if (IsServer)
+        {
+            SetActiveForEachPlayerClientRpc(gameObjectName, active);
+        }
+        else
+        {
+            SetActiveForEachPlayerServerRpc(gameObjectName, active);
+        }
+    }
+
     public void SetEnabledForEveryone(Behaviour target, bool enabled)
     {
         if (target == null)
@@ -172,6 +189,49 @@ public class NetworkAssetsManager : NetworkBehaviour
         {
             StopForEveryoneServerRpc(sourceReference, sourcePath, isParticleSystem);
         }
+    }
+
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+    private void SetActiveForEachPlayerServerRpc(string gameObjectName, bool active)
+    {
+        SetActiveForEachPlayerClientRpc(gameObjectName, active);
+    }
+
+    [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
+    private void SetActiveForEachPlayerClientRpc(string gameObjectName, bool active)
+    {
+        NetworkObject localPlayer = NetworkManager.Singleton.LocalClient?.PlayerObject;
+        if (localPlayer == null)
+        {
+            Debug.LogWarning(
+                $"Cannot set '{gameObjectName}' active state because the local player is not available.",
+                this);
+            return;
+        }
+
+        Transform target = FindChildByName(localPlayer.transform, gameObjectName);
+        if (target == null)
+        {
+            Debug.LogWarning(
+                $"GameObject '{gameObjectName}' was not found under the local player.",
+                this);
+            return;
+        }
+
+        target.gameObject.SetActive(active);
+    }
+
+    private static Transform FindChildByName(Transform root, string gameObjectName)
+    {
+        foreach (Transform child in root.GetComponentsInChildren<Transform>(true))
+        {
+            if (child.name == gameObjectName)
+            {
+                return child;
+            }
+        }
+
+        return null;
     }
 
     [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]

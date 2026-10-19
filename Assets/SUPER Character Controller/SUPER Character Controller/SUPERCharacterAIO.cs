@@ -73,6 +73,7 @@ public class SUPERCharacterAIO : MonoBehaviour{
     Vector2 MouseXY;
     Vector2 pendingMouseXY;
     Vector2 viewRotVelRef;
+    bool ignoreNextMouseInput;
     bool isInFirstPerson, isInThirdPerson, perspecTog;
     bool setInitialRot = true;
     Vector3 initialRot;
@@ -476,7 +477,18 @@ public class SUPERCharacterAIO : MonoBehaviour{
             #endif
             MovInput = Vector2.up *Input.GetAxisRaw("Vertical") + Vector2.right * Input.GetAxisRaw("Horizontal");
         #endif
-            pendingMouseXY += MouseXY;
+            if (!lockAndHideMouse || ignoreNextMouseInput)
+            {
+                MouseXY = Vector2.zero;
+                pendingMouseXY = Vector2.zero;
+                MovInput = Vector2.zero;
+                MovInput_Smoothed = Vector2.zero;
+                ignoreNextMouseInput = false;
+            }
+            else
+            {
+                pendingMouseXY += MouseXY;
+            }
         #endregion
 
         #region Camera
@@ -499,7 +511,6 @@ public class SUPERCharacterAIO : MonoBehaviour{
                 }break;
             }
 
-            
             if(setInitialRot){
                 setInitialRot = false;
                 RotateView(initialRot,false);
@@ -580,13 +591,35 @@ public class SUPERCharacterAIO : MonoBehaviour{
         UpdateAnimationTriggers(controllerPaused);
         #endregion
     }
+
+    public void ResetInputState()
+    {
+        MouseXY = Vector2.zero;
+        pendingMouseXY = Vector2.zero;
+        MovInput = Vector2.zero;
+        MovInput_Smoothed = Vector2.zero;
+        InputDir = Vector3.zero;
+        jumpInput_Momentary = false;
+        jumpInput_FrameOf = false;
+        crouchInput_Momentary = false;
+        crouchInput_FrameOf = false;
+        sprintInput_Momentary = false;
+        sprintInput_FrameOf = false;
+        slideInput_Momentary = false;
+        slideInput_FrameOf = false;
+        isIdle = true;
+        p_Rigidbody.linearVelocity = Vector3.zero;
+        p_Rigidbody.angularVelocity = Vector3.zero;
+        ignoreNextMouseInput = true;
+    }
+
     void FixedUpdate() {
         if(!controllerPaused){
 
             
 
             #region Movement
-            if(enableMovementControl){
+            if(enableMovementControl && lockAndHideMouse){
                 GetGroundInfo();
                 MovePlayer(InputDir,currentGroundSpeed);
 
@@ -595,13 +628,15 @@ public class SUPERCharacterAIO : MonoBehaviour{
             #endregion
 
             #region Camera
-            RotateView(pendingMouseXY, Sensitivity, rotationWeight);
-            pendingMouseXY = Vector2.zero;
-             if(cameraPerspective == PerspectiveModes._3rdPerson){
-                UpdateBodyRotation_3rdPerson();
-                UpdateCameraPosition_3rdPerson();
+            if (lockAndHideMouse)
+            {
+                RotateView(pendingMouseXY, Sensitivity, rotationWeight);
+                pendingMouseXY = Vector2.zero;
+                if(cameraPerspective == PerspectiveModes._3rdPerson){
+                    UpdateBodyRotation_3rdPerson();
+                    UpdateCameraPosition_3rdPerson();
+                }
             }
-  
             #endregion
         }
     }
@@ -727,6 +762,22 @@ public class SUPERCharacterAIO : MonoBehaviour{
             }break;
         }
     }
+
+    public void RefreshCameraPosition()
+    {
+        if (!playerCamera ||
+            !p_Rigidbody ||
+            !capsule ||
+            cameraPerspective != PerspectiveModes._3rdPerson)
+        {
+            return;
+        }
+
+        headPos = p_Rigidbody.position + Vector3.up * standingEyeHeight;
+        quatHeadRot = Quaternion.Euler(headRot);
+        UpdateCameraPosition_3rdPerson();
+    }
+
     public void ChangePerspective(PerspectiveModes newPerspective = PerspectiveModes._1stPerson){
         switch(newPerspective){
             case PerspectiveModes._1stPerson:{
