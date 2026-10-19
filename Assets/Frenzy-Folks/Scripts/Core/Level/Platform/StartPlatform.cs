@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 [RequireComponent(typeof(NetworkObject))]
-public class StartZone : Checkpoint
+public class StartPlatform : Checkpoint
 {
     [SerializeField] private BoxCollider startZone;
     [SerializeField, Min(1f)] private float countdownDuration = 5f;
@@ -62,6 +62,8 @@ public class StartZone : Checkpoint
         }
 
         Vector3 spawnPosition = startZone.transform.TransformPoint(startZone.center);
+        spawnPosition.y += 0.35f;
+        
         Quaternion spawnRotation = startZone.transform.rotation;
 
         foreach (NetworkPlayer player in players)
@@ -206,6 +208,7 @@ public class StartZone : Checkpoint
 
     private void OnTriggerExit(Collider other)
     {
+        Debug.Log("OnTriggerExit");
         if (!other.TryGetComponent(out NetworkPlayer player))
         {
             player = other.GetComponentInParent<NetworkPlayer>();

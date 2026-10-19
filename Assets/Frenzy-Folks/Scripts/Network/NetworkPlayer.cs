@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Frenzy_Folks.Scripts.Core;
 using SUPERCharacter;
 using Unity.Netcode;
 using UnityEngine;
@@ -43,6 +44,7 @@ public class NetworkPlayer : NetworkBehaviour
         {
             lastValidatedPosition = transform.position;
             lastValidationTime = NetworkManager.ServerTime.Time;
+            GameState.Instance.InitializePlayerCheckpoint(OwnerClientId);
         }
 
         if (IsOwner)
@@ -195,6 +197,12 @@ public class NetworkPlayer : NetworkBehaviour
     private void RespawnAtOwnerRpc(Vector3 position, Quaternion rotation)
     {
         ApplyRespawnPosition(position, rotation);
+    }
+
+    [Rpc(SendTo.Owner)]
+    public void ApplyCheckpointColorRpc(int reachedCheckpointIndex)
+    {
+        Checkpoint.ApplyColorsUpTo(reachedCheckpointIndex);
     }
 
     public void AlignOwnerCameraToPlayerRotation()

@@ -71,6 +71,12 @@
             "value": {
                 "rid": 1011
             }
+        },
+        {
+            "key": "start_platform",
+            "value": {
+                "rid": 1012
+            }
         }
     ],
     "references": {
@@ -93,9 +99,9 @@
                         },
                         "rotation": {
                             "x": 0.0,
-                            "y": 0.36058545112609863,
+                            "y": -0.18806013464927673,
                             "z": 0.0,
-                            "w": 0.9327262043952942
+                            "w": 0.9821575284004211
                         },
                         "scale": {
                             "x": 1.0,
@@ -105,7 +111,7 @@
                     },
                     "pushSpeed": 100.0,
                     "blowingDuration": 7.0,
-                    "pauseDuration": 0.10000000149011612,
+                    "pauseDuration": 3.0,
                     "sweepAngle": 45.0
                 }
             },
@@ -452,6 +458,36 @@
                     "makePlatformFall": true,
                     "delayBeforeFalling": 2.0,
                     "delayBeforeRespawning": 3.0
+                }
+            },
+            {
+                "rid": 1012,
+                "type": {
+                    "class": "StartPlatformConfiguration",
+                    "ns": "",
+                    "asm": "Assembly-CSharp"
+                },
+                "data": {
+                    "name": "",
+                    "transform": {
+                        "position": {
+                            "x": -7.64971923828125,
+                            "y": 0.5900000333786011,
+                            "z": 17.471149444580078
+                        },
+                        "rotation": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0,
+                            "w": 1.0
+                        },
+                        "scale": {
+                            "x": 3.0,
+                            "y": 0.20000000298023224,
+                            "z": 3.0
+                        }
+                    },
+                    "checkpointIndex": 0
                 }
             }
         ]

@@ -36,8 +36,12 @@ public class Platform : NetworkBehaviour
         _rigidbody = GetComponent<Rigidbody>();
         _rigidbody.isKinematic = true;
         _rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
-        _initialPosition = _rigidbody.position;
-        _initialRotation = _rigidbody.rotation;
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        _initialPosition = transform.position;
+        _initialRotation = transform.rotation;
     }
 
     public void OnTriggerEnter(Collider other)

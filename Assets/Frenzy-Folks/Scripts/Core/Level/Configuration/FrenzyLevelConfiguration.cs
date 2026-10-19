@@ -42,6 +42,10 @@ public class FrenzyLevelConfiguration
         {
             "turret_trap",
             () => new TurretTrapConfiguration()
+        },
+        {
+            "start_platform",
+            () => new StartPlatformConfiguration()
         }
     };
     
@@ -116,6 +120,10 @@ public class FrenzyLevelConfiguration
         NetworkObject networkObject = instance.GetComponent<NetworkObject>();
         networkObject.Spawn(true);
         networkObject.TrySetParent(_parentLevel.transform);
+        _parentLevel.ApplyElementConfigurationRpc(
+            networkObject,
+            entry.key,
+            JsonUtility.ToJson(entry.value));
     }
 
     public void Load(string json)
@@ -128,6 +136,44 @@ public class FrenzyLevelConfiguration
         {
             AddToLevel<BaseConfigurationSerializable>(configurationEntry, _parentLevel.levelPrefabs[configurationEntry.key]);
         }
+    }
+
+    public static void ApplyToElement(
+        GameObject target,
+        string elementKey,
+        string configurationJson)
+    {
+        if (!ConfigurationDefinitions.TryGetValue(
+                elementKey,
+                out Func<BaseConfigurationSerializable> createConfiguration))
+        {
+            Debug.LogWarning($"No configuration entry found for key: {elementKey}");
+            return;
+        }
+
+        BaseConfigurationSerializable configuration = createConfiguration.Invoke();
+        JsonUtility.FromJsonOverwrite(configurationJson, configuration);
+
+        configuration.Apply(target);
+    }
+
+    public static bool TryGetConfigurationJson(
+        GameObject target,
+        string elementKey,
+        out string configurationJson)
+    {
+        configurationJson = null;
+        if (!ConfigurationDefinitions.TryGetValue(
+                elementKey,
+                out Func<BaseConfigurationSerializable> createConfiguration))
+        {
+            return false;
+        }
+
+        BaseConfigurationSerializable configuration = createConfiguration.Invoke();
+        configuration.From(target);
+        configurationJson = JsonUtility.ToJson(configuration);
+        return true;
     }
     
     public static FrenzyLevelConfiguration Load(FrenzyLevel level, string levelName, Dictionary<string, GameObject> prefabs)
