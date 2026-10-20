@@ -14,7 +14,6 @@ public class StartPlatform : Checkpoint
     [SerializeField, Min(1f)] private float countdownDuration = 5f;
     [SerializeField] private string countdownCanvasName = "PlayerCanvas";
     [SerializeField] private string countdownTextName = "StartTimerText";
-    [SerializeField] private UnityEvent onGameStarted;
 
     private readonly List<NetworkPlayer> players = new();
     private bool countdownStarted;
@@ -141,7 +140,6 @@ public class StartPlatform : Checkpoint
         LockPlayers(false);
         SendCountdownToClientsRpc(string.Empty);
         NetworkAssetsManager.Instance.SetActiveForEachPlayer(countdownTextName, false);
-        onGameStarted?.Invoke();
         Debug.Log("[StartScript] Game started.", this);
     }
 

@@ -18,6 +18,15 @@ public class HostMenu : MonoBehaviour
 
     public void HostGame()
     {
-        FrenzyNetworkManager.Get().StartHost();
+        string playerName = playerNameField.text.Trim();
+        if (string.IsNullOrWhiteSpace(playerName))
+        {
+            Debug.LogError("Name can not be empty");
+            return;
+        }
+
+        UserSettings.Singleton.LastPlayerName = playerName;
+        UserSettings.Singleton.Save();
+        FrenzyNetworkManager.Get().StartHost(playerName);
     }
 }

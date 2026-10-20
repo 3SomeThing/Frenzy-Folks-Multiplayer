@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Netcode;
 
 namespace Frenzy_Folks.Scripts.Core
@@ -11,6 +12,11 @@ namespace Frenzy_Folks.Scripts.Core
             new Dictionary<ulong, int>();
         private readonly Dictionary<ulong, Checkpoint> playerCheckpoints =
             new Dictionary<ulong, Checkpoint>();
+        private NetworkList<FixedString128Bytes> _playerArrivalOrder;
+        private NetworkList<FixedString128Bytes> _unfinishedPlayerNames;
+
+        public NetworkList<FixedString128Bytes> PlayerArrivalOrder => _playerArrivalOrder;
+        public NetworkList<FixedString128Bytes> UnfinishedPlayerNames => _unfinishedPlayerNames;
         
         private NetworkVariable<bool> _lockJoining = new NetworkVariable<bool>(false,
             NetworkVariableReadPermission.Everyone,
@@ -37,10 +43,15 @@ namespace Frenzy_Folks.Scripts.Core
             }
 
             Instance = this;
+            _playerArrivalOrder = new NetworkList<FixedString128Bytes>();
+            _unfinishedPlayerNames = new NetworkList<FixedString128Bytes>();
         }
 
         private void OnDestroy()
         {
+            _playerArrivalOrder?.Dispose();
+            _unfinishedPlayerNames?.Dispose();
+
             if (Instance == this)
             {
                 Instance = null;
@@ -66,6 +77,60 @@ namespace Frenzy_Folks.Scripts.Core
             if (!usersLastCheckpoint.ContainsKey(playerId))
             {
                 usersLastCheckpoint[playerId] = -1;
+            }
+        }
+
+        public void ResetCheckpoints(IEnumerable<ulong> playerIds)
+        {
+            if (!IsServer)
+            {
+                return;
+            }
+
+            usersLastCheckpoint.Clear();
+            playerCheckpoints.Clear();
+
+            foreach (ulong playerId in playerIds)
+            {
+                usersLastCheckpoint[playerId] = -1;
+            }
+        }
+
+        public void ClearPlayerArrivalOrder()
+        {
+            if (!IsServer)
+            {
+                return;
+            }
+
+            _playerArrivalOrder.Clear();
+        }
+
+        public void SetPlayerArrivalOrder(IReadOnlyList<string> playerNames)
+        {
+            if (!IsServer)
+            {
+                return;
+            }
+
+            ClearPlayerArrivalOrder();
+            foreach (string playerName in playerNames)
+            {
+                _playerArrivalOrder.Add(new FixedString128Bytes(playerName));
+            }
+        }
+
+        public void SetUnfinishedPlayerNames(IReadOnlyList<string> playerNames)
+        {
+            if (!IsServer)
+            {
+                return;
+            }
+
+            _unfinishedPlayerNames.Clear();
+            foreach (string playerName in playerNames)
+            {
+                _unfinishedPlayerNames.Add(new FixedString128Bytes(playerName));
             }
         }
 
