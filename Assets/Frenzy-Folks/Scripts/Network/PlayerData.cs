@@ -9,7 +9,7 @@ namespace Frenzy_Folks.Scripts.Network
             new NetworkVariable<FixedString128Bytes>(
                 default,
                 NetworkVariableReadPermission.Everyone,
-                NetworkVariableWritePermission.Owner);
+                NetworkVariableWritePermission.Server);
 
         public string PlayerName
         {

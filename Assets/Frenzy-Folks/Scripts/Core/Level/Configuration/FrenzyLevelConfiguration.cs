@@ -50,6 +50,26 @@ public class FrenzyLevelConfiguration
         {
             "end_platform",
             () => new EndPlatformConfiguration()
+        },
+        {
+            "big_pink_building",
+            () => new BuildingConfiguration()
+        },
+        {
+            "medium_pink_building",
+            () => new BuildingConfiguration()
+        },
+        {
+            "medium_white_building",
+            () => new BuildingConfiguration()
+        },
+        {
+            "small_blue_building",
+            () => new BuildingConfiguration()
+        },
+        {
+            "small_white_building",
+            () => new BuildingConfiguration()
         }
     };
     
