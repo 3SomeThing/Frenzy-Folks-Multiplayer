@@ -10,12 +10,16 @@ public class MovablePlatform : NetworkBehaviour
     [SerializeField] private bool smoothMovement = true;
     [SerializeField, Min(0.01f)] private float smoothTime = 0.15f;
 
-    public float Speed => speed;
+    public float Speed
+    {
+        get => speed;
+        set => speed = value;
+    }
 
     /// <summary>World-space velocity of the platform, valid on host AND clients.</summary>
     public Vector3 Velocity { get; private set; }
 
-    private readonly List<Vector3> pathPoints = new();
+    [SerializeField] private List<Vector3> pathPoints = new();
     private int _currentPathIndex;
     private float _pauseTimer;
 
@@ -23,6 +27,7 @@ public class MovablePlatform : NetworkBehaviour
     private Vector3 _lastObservedPos;
     private bool _hasObserved;
     private Vector3 _smoothVelocity;
+    private bool _needsInitialSnap = true;
 
     // Server (or offline) drives the movement, clients only observe it
     private bool HasAuthority => !IsSpawned || IsServer;
@@ -40,6 +45,7 @@ public class MovablePlatform : NetworkBehaviour
         _currentPathIndex = 0;
         _pauseTimer = 0f;
         _smoothVelocity = Vector3.zero;
+        _needsInitialSnap = true;
     }
 
     public List<Vector3> GetPathPoints()
@@ -61,6 +67,23 @@ public class MovablePlatform : NetworkBehaviour
             return;
         }
 
+        // Premier tick après (re)définition du chemin : on se place exactement
+        // sur le point 0 et on vise directement le point suivant.
+        if (_needsInitialSnap)
+        {
+            _needsInitialSnap = false;
+
+            Vector3 start = pathPoints[0];
+            transform.position = start;
+            _body.position = start;
+
+            _currentPathIndex = pathPoints.Count > 1 ? 1 : 0;
+            _pauseTimer = 0f;
+            _smoothVelocity = Vector3.zero;
+            Velocity = Vector3.zero;
+            return;
+        }
+
         if (_pauseTimer > 0f)
         {
             _pauseTimer -= Time.fixedDeltaTime;
@@ -71,6 +94,7 @@ public class MovablePlatform : NetworkBehaviour
 
         Vector3 current = _body.position;
         Vector3 target = pathPoints[_currentPathIndex];
+
         Vector3 next = smoothMovement
             ? Vector3.SmoothDamp(
                 current,

@@ -46,6 +46,10 @@ public class FrenzyLevelConfiguration
         {
             "start_platform",
             () => new StartPlatformConfiguration()
+        },
+        {
+            "end_platform",
+            () => new EndPlatformConfiguration()
         }
     };
     

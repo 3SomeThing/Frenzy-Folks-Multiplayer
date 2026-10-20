@@ -7,9 +7,14 @@ using UnityEngine;
 
 public class NetworkPlayer : NetworkBehaviour
 {
+    private const ulong NoSpectatorTarget = ulong.MaxValue;
+
     [SerializeField] private List<GameObject> localOnlyObjects = new();
 
     private SUPERCharacterAIO characterController;
+    private Transform _originalCameraParent;
+    private Vector3 _originalCameraLocalPosition;
+    private Quaternion _originalCameraLocalRotation;
     private Vector3 lastValidatedPosition;
     private double lastValidationTime;
     private MovablePlatform carriedPlatform;
@@ -18,17 +23,36 @@ public class NetworkPlayer : NetworkBehaviour
     private Rigidbody _rigidbody;
     private CapsuleCollider _capsuleCollider;
     private Collider[] _colliders;
+    private Renderer[] _renderers;
     private bool collisionsEnabled = true;
     private readonly NetworkVariable<bool> isRespawning = new(
         false,
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
+    private readonly NetworkVariable<bool> isSpectating = new(
+        false,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server);
+    private readonly NetworkVariable<ulong> spectatorTargetClientId = new(
+        NoSpectatorTarget,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server);
 
     private void Awake()
     {
+        characterController = GetComponent<SUPERCharacterAIO>();
         _rigidbody = GetComponent<Rigidbody>();
         _capsuleCollider = GetComponent<CapsuleCollider>();
         _colliders = GetComponentsInChildren<Collider>(true);
+        _renderers = GetComponentsInChildren<Renderer>(true);
+
+        if (characterController != null && characterController.playerCamera != null)
+        {
+            Transform cameraTransform = characterController.playerCamera.transform;
+            _originalCameraParent = cameraTransform.parent;
+            _originalCameraLocalPosition = cameraTransform.localPosition;
+            _originalCameraLocalRotation = cameraTransform.localRotation;
+        }
     }
 
     public override void OnNetworkSpawn()
@@ -37,8 +61,12 @@ public class NetworkPlayer : NetworkBehaviour
         AlignOwnerCameraToPlayerRotation();
         isRespawning.OnValueChanged += OnRespawningChanged;
         isMovementLocked.OnValueChanged += OnMovementLockedChanged;
+        isSpectating.OnValueChanged += OnSpectatingChanged;
+        spectatorTargetClientId.OnValueChanged += OnSpectatorTargetChanged;
         ApplyRespawningState(isRespawning.Value);
         ApplyMovementLockedState(isMovementLocked.Value);
+        ApplySpectatingState(isSpectating.Value);
+        ApplySpectatorTarget();
 
         if (IsServer)
         {
@@ -58,6 +86,22 @@ public class NetworkPlayer : NetworkBehaviour
         }
     }
 
+    public void AssignWorldCanvasCameraRpc()
+    {
+        if (!IsServer)
+        {
+            return;
+        }
+
+        AssignWorldCanvasCameraClientRpc();
+    }
+
+    [Rpc(SendTo.Owner, InvokePermission = RpcInvokePermission.Server)]
+    private void AssignWorldCanvasCameraClientRpc()
+    {
+        AssignWorldCanvasCamera();
+    }
+
     private void AssignWorldCanvasCamera()
     {
         if (characterController == null || characterController.playerCamera == null)
@@ -65,13 +109,17 @@ public class NetworkPlayer : NetworkBehaviour
             return;
         }
 
-        Canvas[] canvases = FindObjectsByType<Canvas>();
+        GameObject levelCanvas = GameObject.Find("LevelCanvas");
+        if (levelCanvas == null)
+        {
+            Debug.LogWarning("LevelCanvas not found while assigning the player camera.", this);
+            return;
+        }
+
+        Canvas[] canvases = levelCanvas.GetComponentsInChildren<Canvas>(true);
         foreach (Canvas canvas in canvases)
         {
-            if (canvas.renderMode == RenderMode.WorldSpace)
-            {
-                canvas.worldCamera = characterController.playerCamera;
-            }
+            canvas.worldCamera = characterController.playerCamera;
         }
     }
 
@@ -79,6 +127,8 @@ public class NetworkPlayer : NetworkBehaviour
     {
         isRespawning.OnValueChanged -= OnRespawningChanged;
         isMovementLocked.OnValueChanged -= OnMovementLockedChanged;
+        isSpectating.OnValueChanged -= OnSpectatingChanged;
+        spectatorTargetClientId.OnValueChanged -= OnSpectatorTargetChanged;
     }
 
     private readonly NetworkVariable<bool> isMovementLocked = new(
@@ -95,6 +145,70 @@ public class NetworkPlayer : NetworkBehaviour
 
         isMovementLocked.Value = locked;
         ApplyMovementLockedState(locked);
+    }
+
+    public void SetSpectating(ulong targetClientId)
+    {
+        if (!IsServer)
+        {
+            return;
+        }
+
+        spectatorTargetClientId.Value = targetClientId;
+        isSpectating.Value = true;
+        ApplySpectatingState(true);
+        ApplySpectatorTarget();
+    }
+
+    public void SetSpectatorTarget(ulong targetClientId)
+    {
+        if (!IsServer || !isSpectating.Value)
+        {
+            return;
+        }
+
+        spectatorTargetClientId.Value = targetClientId;
+        ApplySpectatorTarget();
+    }
+
+    public void ResetSpectating()
+    {
+        if (!IsServer)
+        {
+            return;
+        }
+
+        spectatorTargetClientId.Value = NoSpectatorTarget;
+        isSpectating.Value = false;
+        isMovementLocked.Value = false;
+        collisionsEnabled = true;
+        ApplySpectatingState(false);
+        ApplyMovementLockedState(false);
+    }
+
+    public void ResetForLobby()
+    {
+        if (!IsServer)
+        {
+            return;
+        }
+
+        isRespawning.Value = false;
+        spectatorTargetClientId.Value = NoSpectatorTarget;
+        isSpectating.Value = false;
+        isMovementLocked.Value = false;
+        collisionsEnabled = true;
+
+        ResetForLobbyRpc();
+    }
+
+    [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
+    private void ResetForLobbyRpc()
+    {
+        collisionsEnabled = true;
+        ApplyRespawningState(false);
+        ApplySpectatingState(false);
+        ApplyMovementLockedState(false);
     }
 
     [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
@@ -235,6 +349,100 @@ public class NetworkPlayer : NetworkBehaviour
     private void OnMovementLockedChanged(bool previousValue, bool currentValue)
     {
         ApplyMovementLockedState(currentValue);
+    }
+
+    private void OnSpectatingChanged(bool previousValue, bool currentValue)
+    {
+        ApplySpectatingState(currentValue);
+    }
+
+    private void OnSpectatorTargetChanged(ulong previousValue, ulong currentValue)
+    {
+        ApplySpectatorTarget();
+    }
+
+    private void ApplySpectatingState(bool spectating)
+    {
+        if (!spectating)
+        {
+            foreach (Renderer renderer in _renderers)
+            {
+                renderer.enabled = true;
+            }
+
+            ApplyCollisionsEnabled(true);
+
+            if (IsOwner)
+            {
+                foreach (GameObject localOnlyObject in localOnlyObjects)
+                {
+                    localOnlyObject.SetActive(true);
+                }
+
+                Camera playerCamera = characterController?.playerCamera;
+                if (playerCamera != null && _originalCameraParent != null)
+                {
+                    playerCamera.transform.SetParent(_originalCameraParent, false);
+                    playerCamera.transform.localPosition = _originalCameraLocalPosition;
+                    playerCamera.transform.localRotation = _originalCameraLocalRotation;
+                    playerCamera.enabled = true;
+                    AlignOwnerCameraToPlayerRotation();
+                }
+            }
+
+            return;
+        }
+
+        ApplyMovementLockedState(true);
+        ApplyCollisionsEnabled(false);
+
+        foreach (Renderer renderer in _renderers)
+        {
+            renderer.enabled = false;
+        }
+
+        if (!IsOwner || characterController == null || characterController.playerCamera == null)
+        {
+            return;
+        }
+
+        foreach (GameObject localOnlyObject in localOnlyObjects)
+        {
+            localOnlyObject.SetActive(false);
+        }
+
+        Camera playerCameraVar = characterController.playerCamera;
+        playerCameraVar.gameObject.SetActive(true);
+        playerCameraVar.enabled = true;
+    }
+
+    private void ApplySpectatorTarget()
+    {
+        if (!IsOwner ||
+            !isSpectating.Value ||
+            spectatorTargetClientId.Value == NoSpectatorTarget ||
+            !NetworkManager.Singleton.ConnectedClients.TryGetValue(
+                spectatorTargetClientId.Value,
+                out NetworkClient targetClient) ||
+            targetClient.PlayerObject == null)
+        {
+            return;
+        }
+
+        Camera playerCamera = characterController?.playerCamera;
+        if (playerCamera == null)
+        {
+            return;
+        }
+
+        playerCamera.transform.SetParent(targetClient.PlayerObject.transform, false);
+        playerCamera.transform.localPosition = new Vector3(0f, 2f, -8f);
+        playerCamera.transform.localRotation = Quaternion.identity;
+    }
+
+    private void LateUpdate()
+    {
+        ApplySpectatorTarget();
     }
 
     private void ApplyMovementLockedState(bool locked)

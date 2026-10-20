@@ -26,15 +26,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9146521877790906938, guid: 2420ab9f71fd6f446bafdfc9d0a0e60f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.764542
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9146521877790906938, guid: 2420ab9f71fd6f446bafdfc9d0a0e60f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.50000006
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9146521877790906938, guid: 2420ab9f71fd6f446bafdfc9d0a0e60f, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 31.686607
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9146521877790906938, guid: 2420ab9f71fd6f446bafdfc9d0a0e60f, type: 3}
       propertyPath: m_LocalRotation.w
@@ -254,7 +254,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 2665438152
+  GlobalObjectIdHash: 931362001
   InScenePlacedSourceGlobalObjectIdHash: 0
   m_InScenePlacedDisabledByDefault: 0
   DeferredDespawnTick: 0

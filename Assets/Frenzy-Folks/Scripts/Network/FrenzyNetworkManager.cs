@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using Frenzy_Folks.Scripts.Core;
 using Frenzy_Folks.Scripts.Startup;
 using Unity.Netcode;
@@ -13,14 +14,14 @@ public class FrenzyNetworkManager : MonoBehaviour
 
     private ServerEventHandler _serverEventHandler;
 
-    public void StartHost()
+    public void StartHost(string playerName)
     {
         // We assume that we are the server, I don't see a way as it is not possible
         _serverEventHandler = Instantiate(serverEventHandlerPrefab);
         NetworkManager.Singleton.OnServerStarted += _serverEventHandler.OnServerStarted;
         NetworkManager.Singleton.OnServerStopped += _serverEventHandler.OnServerStopped;
         
-        SetConnectionData("0.0.0.0", 6767);
+        SetConnectionData("0.0.0.0", 6767, playerName);
 
         bool success = NetworkManager.Singleton.StartHost();
 
@@ -31,15 +32,16 @@ public class FrenzyNetworkManager : MonoBehaviour
 
     public void ConnectToServer(string ip, ushort port)
     {
-        SetConnectionData(ip, port);
+        SetConnectionData(ip, port, UserSettings.Singleton.LastPlayerName);
 
         NetworkManager.Singleton.StartClient();
     }
 
-    private void SetConnectionData(string ip, ushort port)
+    private void SetConnectionData(string ip, ushort port, string playerName)
     {
         UnityTransport utp = (UnityTransport)NetworkManager.Singleton.NetworkConfig.NetworkTransport;
         utp.SetConnectionData(ip, port);
+        NetworkManager.Singleton.NetworkConfig.ConnectionData = Encoding.UTF8.GetBytes(playerName);
     }
 
     public static FrenzyNetworkManager Get()

@@ -19,8 +19,8 @@ public class Checkpoint : NetworkBehaviour
     [SerializeField] private ParticleSystem checkpointParticules;
     [SerializeField] private SkinnedMeshRenderer cylinder;
     
-    [SerializeField] private bool playSoundAndAnimation = true;
-    [SerializeField] private bool changeColor = true;
+    [SerializeField] public bool playSoundAndAnimation = true;
+    [SerializeField] public bool changeColor = true;
     
     private MaterialPropertyBlock block;
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");

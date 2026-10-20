@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 2866189753
+  GlobalObjectIdHash: 2331151520
   InScenePlacedSourceGlobalObjectIdHash: 0
   m_InScenePlacedDisabledByDefault: 0
   DeferredDespawnTick: 0
@@ -88,3 +88,7 @@ MonoBehaviour:
     value: {fileID: 5424937700218060980, guid: 64b48effd5a8e4b43a07ea50661a5f62, type: 3}
   - key: turret_trap
     value: {fileID: 5670505714895977808, guid: 65523869d5709b7319445039dad12aa2, type: 3}
+  - key: start_platform
+    value: {fileID: 7713893165195602969, guid: 07313812e77c0234182773e2d500c10b, type: 3}
+  - key: end_platform
+    value: {fileID: 7713893165195602969, guid: 75c5b75cf767a9745941f9925127ad79, type: 3}
