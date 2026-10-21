@@ -206,7 +206,7 @@ public class StartPlatform : Checkpoint
 
     private void OnTriggerExit(Collider other)
     {
-        Debug.Log("OnTriggerExit");
+        // Debug.Log("OnTriggerExit");
         if (!other.TryGetComponent(out NetworkPlayer player))
         {
             player = other.GetComponentInParent<NetworkPlayer>();

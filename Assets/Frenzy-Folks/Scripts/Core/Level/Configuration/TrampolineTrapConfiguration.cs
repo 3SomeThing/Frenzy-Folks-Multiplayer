@@ -6,6 +6,7 @@ public class TrampolineTrapConfiguration : LevelElementConfiguration<TrampolineT
     
     public override void Apply(TrampolineTrap trampoline)
     {
+        Debug.Log(transform + " Applying TrampolineTrapConfiguration to " + trampoline.name);
         trampoline.pushSpeedVertical = pushSpeedVertical;
     }
 

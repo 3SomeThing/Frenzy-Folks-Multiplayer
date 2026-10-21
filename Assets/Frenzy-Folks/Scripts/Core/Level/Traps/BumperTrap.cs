@@ -16,13 +16,19 @@ public class BumperTrap : MonoBehaviour
     private int playerLayer; //TODO: Generique partout
 
     private Spring spring;
-    private Vector3 initialScale;
     private bool isBumping;
     private bool isReturningToRest;
 
+    /**
+     * TODO: Fix this, should be the original scale of the object,
+    // but it is not set correctly in Awake() because the object is scaled by the parent.
+    // We need to find a way to get the original scale of the object without being affected by the parent scale.
+     */
+    private Vector3 initialScale = Vector3.one * 5F;
+    
     private void Awake()
     {
-        initialScale = transform.localScale;
+        // initialScale = transform.localScale;
         spring = new Spring(
             config: SpringConfig.Create(tension: 600, friction: 12),
             from: 1f,

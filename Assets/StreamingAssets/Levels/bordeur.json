@@ -1,0 +1,579 @@
+﻿{
+  "configurationEntries": [
+    {
+      "key": "checkpoint",
+      "value": {
+        "rid": 1000
+      }
+    },
+    {
+      "key": "medium_pink_building",
+      "value": {
+        "rid": 1001
+      }
+    },
+    {
+      "key": "small_blue_building",
+      "value": {
+        "rid": 1002
+      }
+    },
+    {
+      "key": "small_blue_building",
+      "value": {
+        "rid": 1003
+      }
+    },
+    {
+      "key": "medium_white_building",
+      "value": {
+        "rid": 1004
+      }
+    },
+    {
+      "key": "medium_white_building",
+      "value": {
+        "rid": 1005
+      }
+    },
+    {
+      "key": "medium_white_building",
+      "value": {
+        "rid": 1006
+      }
+    },
+    {
+      "key": "small_white_building",
+      "value": {
+        "rid": 1007
+      }
+    },
+    {
+      "key": "big_pink_building",
+      "value": {
+        "rid": 1008
+      }
+    },
+    {
+      "key": "platform",
+      "value": {
+        "rid": 1009
+      }
+    },
+    {
+      "key": "platform",
+      "value": {
+        "rid": 1010
+      }
+    },
+    {
+      "key": "platform",
+      "value": {
+        "rid": 1011
+      }
+    },
+    {
+      "key": "medium_white_building",
+      "value": {
+        "rid": 1012
+      }
+    },
+    {
+      "key": "medium_white_building",
+      "value": {
+        "rid": 1013
+      }
+    },
+    {
+      "key": "small_white_building",
+      "value": {
+        "rid": 1014
+      }
+    },
+    {
+      "key": "medium_white_building",
+      "value": {
+        "rid": 1015
+      }
+    }
+  ],
+  "references": {
+    "version": 2,
+    "RefIds": [
+      {
+        "rid": 1000,
+        "type": {
+          "class": "CheckpointConfiguration",
+          "ns": "",
+          "asm": "Assembly-CSharp"
+        },
+        "data": {
+          "name": "",
+          "transform": {
+            "position": {
+              "x": 3.9960005283355713,
+              "y": 3.5830001831054688,
+              "z": -7.830000400543213
+            },
+            "rotation": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0,
+              "w": 1.0
+            },
+            "scale": {
+              "x": 2.5999999046325684,
+              "y": 2.5999999046325684,
+              "z": 2.5999999046325684
+            }
+          },
+          "checkpointIndex": 1
+        }
+      },
+      {
+        "rid": 1001,
+        "type": {
+          "class": "BuildingConfiguration",
+          "ns": "",
+          "asm": "Assembly-CSharp"
+        },
+        "data": {
+          "name": "",
+          "transform": {
+            "position": {
+              "x": 2.9600002765655518,
+              "y": 2.25,
+              "z": -2.885000228881836
+            },
+            "rotation": {
+              "x": -0.7071068286895752,
+              "y": 0.0,
+              "z": 0.0,
+              "w": 0.7071067094802856
+            },
+            "scale": {
+              "x": 0.8500000238418579,
+              "y": 0.8500000238418579,
+              "z": 0.8500000238418579
+            }
+          }
+        }
+      },
+      {
+        "rid": 1002,
+        "type": {
+          "class": "BuildingConfiguration",
+          "ns": "",
+          "asm": "Assembly-CSharp"
+        },
+        "data": {
+          "name": "",
+          "transform": {
+            "position": {
+              "x": 2.760000228881836,
+              "y": 3.25,
+              "z": -9.5
+            },
+            "rotation": {
+              "x": -0.5,
+              "y": 0.5,
+              "z": 0.5,
+              "w": 0.5
+            },
+            "scale": {
+              "x": 0.5,
+              "y": 0.5,
+              "z": 0.5
+            }
+          }
+        }
+      },
+      {
+        "rid": 1003,
+        "type": {
+          "class": "BuildingConfiguration",
+          "ns": "",
+          "asm": "Assembly-CSharp"
+        },
+        "data": {
+          "name": "",
+          "transform": {
+            "position": {
+              "x": 4.1100006103515625,
+              "y": 3.25,
+              "z": -9.5
+            },
+            "rotation": {
+              "x": -0.5,
+              "y": 0.5,
+              "z": 0.5,
+              "w": 0.5
+            },
+            "scale": {
+              "x": 0.5,
+              "y": 0.5,
+              "z": 0.5
+            }
+          }
+        }
+      },
+      {
+        "rid": 1004,
+        "type": {
+          "class": "BuildingConfiguration",
+          "ns": "",
+          "asm": "Assembly-CSharp"
+        },
+        "data": {
+          "name": "",
+          "transform": {
+            "position": {
+              "x": 4.3600006103515625,
+              "y": 2.0,
+              "z": -7.5
+            },
+            "rotation": {
+              "x": -0.7071068286895752,
+              "y": 0.0,
+              "z": 0.0,
+              "w": 0.7071067094802856
+            },
+            "scale": {
+              "x": 0.5,
+              "y": 0.5,
+              "z": 0.5
+            }
+          }
+        }
+      },
+      {
+        "rid": 1005,
+        "type": {
+          "class": "BuildingConfiguration",
+          "ns": "",
+          "asm": "Assembly-CSharp"
+        },
+        "data": {
+          "name": "",
+          "transform": {
+            "position": {
+              "x": 4.3600006103515625,
+              "y": 2.0,
+              "z": -6.215000152587891
+            },
+            "rotation": {
+              "x": -0.7071068286895752,
+              "y": 0.0,
+              "z": 0.0,
+              "w": 0.7071067094802856
+            },
+            "scale": {
+              "x": 0.5,
+              "y": 0.5,
+              "z": 0.5
+            }
+          }
+        }
+      },
+      {
+        "rid": 1006,
+        "type": {
+          "class": "BuildingConfiguration",
+          "ns": "",
+          "asm": "Assembly-CSharp"
+        },
+        "data": {
+          "name": "",
+          "transform": {
+            "position": {
+              "x": 4.3600006103515625,
+              "y": 2.0,
+              "z": -4.894999980926514
+            },
+            "rotation": {
+              "x": -0.7071068286895752,
+              "y": 0.0,
+              "z": 0.0,
+              "w": 0.7071067094802856
+            },
+            "scale": {
+              "x": 0.5,
+              "y": 0.5,
+              "z": 0.5
+            }
+          }
+        }
+      },
+      {
+        "rid": 1007,
+        "type": {
+          "class": "BuildingConfiguration",
+          "ns": "",
+          "asm": "Assembly-CSharp"
+        },
+        "data": {
+          "name": "",
+          "transform": {
+            "position": {
+              "x": 2.760000228881836,
+              "y": 1.75,
+              "z": -12.80000114440918
+            },
+            "rotation": {
+              "x": -0.7071068286895752,
+              "y": 0.0,
+              "z": 0.0,
+              "w": 0.7071068286895752
+            },
+            "scale": {
+              "x": 0.5,
+              "y": 0.5,
+              "z": 0.20000000298023224
+            }
+          }
+        }
+      },
+      {
+        "rid": 1008,
+        "type": {
+          "class": "BuildingConfiguration",
+          "ns": "",
+          "asm": "Assembly-CSharp"
+        },
+        "data": {
+          "name": "",
+          "transform": {
+            "position": {
+              "x": 4.510000228881836,
+              "y": 2.5,
+              "z": -1.1500000953674316
+            },
+            "rotation": {
+              "x": -0.5000007748603821,
+              "y": 0.4999992251396179,
+              "z": 0.4999992847442627,
+              "w": 0.5000007152557373
+            },
+            "scale": {
+              "x": 0.5,
+              "y": 0.5,
+              "z": 0.550000011920929
+            }
+          }
+        }
+      },
+      {
+        "rid": 1009,
+        "type": {
+          "class": "PlatformConfiguration",
+          "ns": "",
+          "asm": "Assembly-CSharp"
+        },
+        "data": {
+          "name": "",
+          "transform": {
+            "position": {
+              "x": 4.204000473022461,
+              "y": 3.2740001678466797,
+              "z": -8.844999313354492
+            },
+            "rotation": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0,
+              "w": 1.0
+            },
+            "scale": {
+              "x": 1.0,
+              "y": 1.0,
+              "z": 1.0
+            }
+          },
+          "makePlatformFall": false,
+          "delayBeforeFalling": 2.0,
+          "delayBeforeRespawning": 3.0
+        }
+      },
+      {
+        "rid": 1010,
+        "type": {
+          "class": "PlatformConfiguration",
+          "ns": "",
+          "asm": "Assembly-CSharp"
+        },
+        "data": {
+          "name": "",
+          "transform": {
+            "position": {
+              "x": 4.204000473022461,
+              "y": 3.3554999828338623,
+              "z": -8.53700065612793
+            },
+            "rotation": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0,
+              "w": 1.0
+            },
+            "scale": {
+              "x": 1.0,
+              "y": 1.0,
+              "z": 1.0
+            }
+          },
+          "makePlatformFall": false,
+          "delayBeforeFalling": 2.0,
+          "delayBeforeRespawning": 3.0
+        }
+      },
+      {
+        "rid": 1011,
+        "type": {
+          "class": "PlatformConfiguration",
+          "ns": "",
+          "asm": "Assembly-CSharp"
+        },
+        "data": {
+          "name": "",
+          "transform": {
+            "position": {
+              "x": 4.204000473022461,
+              "y": 3.426500082015991,
+              "z": -8.26449966430664
+            },
+            "rotation": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0,
+              "w": 1.0
+            },
+            "scale": {
+              "x": 1.0,
+              "y": 1.0,
+              "z": 1.0
+            }
+          },
+          "makePlatformFall": false,
+          "delayBeforeFalling": 2.0,
+          "delayBeforeRespawning": 3.0
+        }
+      },
+      {
+        "rid": 1012,
+        "type": {
+          "class": "BuildingConfiguration",
+          "ns": "",
+          "asm": "Assembly-CSharp"
+        },
+        "data": {
+          "name": "",
+          "transform": {
+            "position": {
+              "x": -1.622255563735962,
+              "y": 2.0,
+              "z": -14.348817825317383
+            },
+            "rotation": {
+              "x": -0.7070589065551758,
+              "y": 0.008209964260458946,
+              "z": 0.008210022002458572,
+              "w": 0.7070593237876892
+            },
+            "scale": {
+              "x": 0.5,
+              "y": 0.4999999403953552,
+              "z": 0.4999999403953552
+            }
+          }
+        }
+      },
+      {
+        "rid": 1013,
+        "type": {
+          "class": "BuildingConfiguration",
+          "ns": "",
+          "asm": "Assembly-CSharp"
+        },
+        "data": {
+          "name": "",
+          "transform": {
+            "position": {
+              "x": 7.152641296386719,
+              "y": 2.0,
+              "z": -14.33407211303711
+            },
+            "rotation": {
+              "x": -0.7071043848991394,
+              "y": -0.001845245249569416,
+              "z": -0.0018452591029927135,
+              "w": 0.7071043848991394
+            },
+            "scale": {
+              "x": 0.5,
+              "y": 0.49999991059303284,
+              "z": 0.4999999403953552
+            }
+          }
+        }
+      },
+      {
+        "rid": 1014,
+        "type": {
+          "class": "BuildingConfiguration",
+          "ns": "",
+          "asm": "Assembly-CSharp"
+        },
+        "data": {
+          "name": "",
+          "transform": {
+            "position": {
+              "x": 9.48058795928955,
+              "y": 1.75,
+              "z": 17.20332908630371
+            },
+            "rotation": {
+              "x": -0.6861143112182617,
+              "y": -0.1710180640220642,
+              "z": -0.1710180640220642,
+              "w": 0.6861143112182617
+            },
+            "scale": {
+              "x": 0.5,
+              "y": 0.5000001192092896,
+              "z": 0.20000004768371582
+            }
+          }
+        }
+      },
+      {
+        "rid": 1015,
+        "type": {
+          "class": "BuildingConfiguration",
+          "ns": "",
+          "asm": "Assembly-CSharp"
+        },
+        "data": {
+          "name": "",
+          "transform": {
+            "position": {
+              "x": 7.183696746826172,
+              "y": 2.0,
+              "z": 14.318033218383789
+            },
+            "rotation": {
+              "x": -0.706959068775177,
+              "y": -0.014454828575253487,
+              "z": -0.014454817399382591,
+              "w": 0.706959068775177
+            },
+            "scale": {
+              "x": 0.5,
+              "y": 0.49999991059303284,
+              "z": 0.4999999403953552
+            }
+          }
+        }
+      }
+    ]
+  }
+}
