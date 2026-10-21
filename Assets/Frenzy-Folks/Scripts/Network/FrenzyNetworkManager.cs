@@ -48,4 +48,22 @@ public class FrenzyNetworkManager : MonoBehaviour
     {
         return NetworkManager.Singleton.GetComponent<FrenzyNetworkManager>();
     }
+
+    public void DespawnAllPlayers()
+    {
+        if (!NetworkManager.Singleton.IsServer || _serverEventHandler == null) return;
+        _serverEventHandler.DespawnAllPlayers();
+    }
+
+    public void RespawnAllPlayers()
+    {
+        if (!NetworkManager.Singleton.IsServer || _serverEventHandler == null) return;
+        _serverEventHandler.RespawnAllPlayers();
+    }
+
+    public void DespawnAndRespawnAllPlayers()
+    {
+        if (!NetworkManager.Singleton.IsServer || _serverEventHandler == null) return;
+        _serverEventHandler.DespawnAndRespawnAllPlayers();
+    }
 }

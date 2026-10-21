@@ -66,8 +66,7 @@ public class RespawnDetector : MonoBehaviour
         {
             GameObject character = player.gameObject.transform.Find("Character").gameObject;
             NetworkAssetsManager.Instance.SetActiveForEveryone(character, false);
-            NetworkAssetsManager.Instance.PlayForEveryone(player.gameObject.transform.Find("Explosion").gameObject.GetComponent<ParticleSystem>());
-            NetworkAssetsManager.Instance.PlayForEveryone(player.gameObject.transform.Find("Death").gameObject.GetComponent<AudioSource>());
+            player.PlayRespawnEffects();
             player.SetRespawning(true);
         }
 

@@ -56,6 +56,9 @@ public class EndPlatform : NetworkBehaviour
 
         GameState.Instance.SetPlayerArrivalOrder(playerNameArrivalsOrder);
         GameState.Instance.SetUnfinishedPlayerNames(GetUnfinishedPlayerNames());
+        
+        FrenzyNetworkManager.Get().DespawnAllPlayers();
+        
         SceneEventProgressStatus status =
             NetworkManager.Singleton.SceneManager.LoadScene("Lobby", LoadSceneMode.Single);
         if (status != SceneEventProgressStatus.Started)
