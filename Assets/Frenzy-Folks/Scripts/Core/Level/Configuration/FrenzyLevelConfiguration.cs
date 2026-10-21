@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Frenzy_Folks.Scripts.Core;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -73,7 +74,7 @@ public class FrenzyLevelConfiguration
         }
     };
     
-    private static readonly string LevelsPath = Path.Combine(Application.streamingAssetsPath, "Levels");
+    public static readonly string LevelsPath = Path.Combine(Application.streamingAssetsPath, "Levels");
 
     [SerializeField]
     private List<ConfigurationEntry> configurationEntries = new();
@@ -156,10 +157,14 @@ public class FrenzyLevelConfiguration
 
         Debug.Log("Configuration entries count: " + configurationEntries.Count);
         
+        Debug.Log("Level file name: " + GameState.Instance.LevelFileName.Value);
+        
         foreach (ConfigurationEntry configurationEntry in configurationEntries)
         {
             AddToLevel<BaseConfigurationSerializable>(configurationEntry, _parentLevel.levelPrefabs[configurationEntry.key]);
         }
+
+        _parentLevel.transform.localScale *= 20;
     }
 
     public static void ApplyToElement(

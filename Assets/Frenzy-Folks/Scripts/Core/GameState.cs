@@ -8,6 +8,10 @@ namespace Frenzy_Folks.Scripts.Core
     {
         public static GameState Instance;
         
+        public NetworkVariable<FixedString128Bytes> LevelFileName = new NetworkVariable<FixedString128Bytes>("",
+         NetworkVariableReadPermission.Everyone,
+         NetworkVariableWritePermission.Server);
+        
         public readonly Dictionary<ulong, int> usersLastCheckpoint =
             new Dictionary<ulong, int>();
         private readonly Dictionary<ulong, Checkpoint> playerCheckpoints =

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using Frenzy_Folks.Scripts.Core;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -107,8 +108,8 @@ public class FrenzyLevel : NetworkBehaviour
             return;
         }
 
-        FrenzyLevelConfiguration.Load(this, "testing-playground.json", levelPrefabs);
-        Debug.Log("Level configuration loaded from testing-playground.json");
+        FrenzyLevelConfiguration.Load(this, $"{GameState.Instance.LevelFileName.Value}.json", levelPrefabs);
+        Debug.Log($"Level configuration loaded from {GameState.Instance.LevelFileName.Value}.json");
     }
 
     private bool IsJsonLevelLoaderActive()
