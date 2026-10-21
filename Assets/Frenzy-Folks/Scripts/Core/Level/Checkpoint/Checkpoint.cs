@@ -153,10 +153,11 @@ public class Checkpoint : NetworkBehaviour
 
         foreach (Checkpoint checkpoint in registeredCheckpoints)
         {
-            if (checkpoint != null && checkpoint.cylinder != null && checkpoint.changeColor)
-            {
-                checkpoint.cylinder.SetPropertyBlock(null);
-            }
+            if (checkpoint != null) continue;
+            
+            if (!checkpoint.changeColor || !checkpoint.cylinder) continue;
+            
+            checkpoint.cylinder.SetPropertyBlock(null);
         }
     }
     
