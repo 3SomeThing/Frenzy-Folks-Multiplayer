@@ -10,10 +10,6 @@ using UnityEngine.InputSystem;
 [Serializable]
 public class FrenzyLevel : NetworkBehaviour
 {
-    private string _levelName;
-
-    private int _maxTime;
-
     [SerializeField] public Dictionary<string, GameObject> levelPrefabs;
     
     private InputAction _inputActionSave = new InputAction(
@@ -28,12 +24,6 @@ public class FrenzyLevel : NetworkBehaviour
 
     private void Awake()
     {
-        // string name = "movable_platform";
-        // GameObject go = levelPrefabs[name];
-        // // MovablePlatformConfiguration configuration = (MovablePlatformConfiguration)configurations[name];
-        // configuration.Apply(go);    
-        //
-        // Debug.Log(JsonUtility.ToJson(configuration));
         _inputActionSave.Enable();
         _inputActionLoad.Enable();
     }
@@ -45,42 +35,37 @@ public class FrenzyLevel : NetworkBehaviour
             return;
         }
 
+        StartCoroutine(LoadSceneAfterFrame());
+
         if (!IsJsonLevelLoaderActive())
         {
             StartCoroutine(SynchronizeSceneElements());
         }
-        //
-        // string path = Path.Combine(Application.streamingAssetsPath, "test-level.json");
-        // // File.Create(path).Close();
-        // // File.WriteAllText(path, JsonUtility.ToJson(new FrenzyLevelConfiguration(this).Save(), true));
-        // // const string json = "{\"configurationEntries\":[{\"key\":\"movable_platform\",\"value\":{\"rid\":1000}}],\"references\":{\"version\":2,\"RefIds\":[{\"rid\":1000,\"type\":{\"class\":\"MovablePlatformConfiguration\",\"ns\":\"\",\"asm\":\"Assembly-CSharp\"},\"data\":{\"name\":\"\",\"transform\":{\"position\":{\"x\":10,\"y\":0,\"z\":0},\"rotation\":{\"x\":0,\"y\":0,\"z\":0,\"w\":0},\"scale\":{\"x\":0,\"y\":0,\"z\":0}},\"pathPoints\":[{\"x\":10,\"y\":10,\"z\":10},{\"x\":2,\"y\":2,\"z\":2},{\"x\":3,\"y\":3,\"z\":3}]}}]}}";
-        // string json = File.ReadAllText(path);
-        // FrenzyLevelConfiguration.Load(this, json, levelPrefabs);
+    }
+    
+    private IEnumerator<WaitForEndOfFrame> LoadSceneAfterFrame()
+    {
+        yield return new WaitForEndOfFrame();
+        LoadLevelConfiguration();
     }
 
     private IEnumerator SynchronizeSceneElements()
     {
         yield return null;
 
-        foreach (SerializedLevelElement element in
-                 FindObjectsOfType<SerializedLevelElement>(true))
+        foreach (SerializedLevelElement element in FindObjectsOfType<SerializedLevelElement>(true))
         {
             NetworkObject networkObject = element.GetComponentInParent<NetworkObject>();
-            if (networkObject == null || !networkObject.IsSpawned)
-            {
-                continue;
-            }
-
-            if (FrenzyLevelConfiguration.TryGetConfigurationJson(
+            if (networkObject == null || !networkObject.IsSpawned ||
+                !FrenzyLevelConfiguration.TryGetConfigurationJson(
                     element.gameObject,
                     element.elementName,
                     out string configurationJson))
             {
-                ApplyElementConfigurationRpc(
-                    networkObject,
-                    element.elementName,
-                    configurationJson);
+                continue;
             }
+
+            SynchronizeElementConfiguration(networkObject, element.elementName, configurationJson);
         }
     }
 
@@ -108,7 +93,7 @@ public class FrenzyLevel : NetworkBehaviour
             return;
         }
 
-        FrenzyLevelConfiguration.Load(this, $"{GameState.Instance.LevelFileName.Value}.json", levelPrefabs);
+        FrenzyLevelConfiguration.Load(this, $"{GameState.Instance.LevelFileName.Value}.json");
         Debug.Log($"Level configuration loaded from {GameState.Instance.LevelFileName.Value}.json");
     }
 
@@ -128,9 +113,37 @@ public class FrenzyLevel : NetworkBehaviour
         Debug.Log("Level configuration saved to testing-playground.json");
     }
 
-    //TODO: Verifier tout ça
+    public void SetLoadedLevelScale(float scale)
+    {
+        if (!IsServer)
+        {
+            return;
+        }
+
+        SetLevelScaleClientRpc(transform.localScale * scale);
+    }
+
     [Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-    public void ApplyElementConfigurationRpc(
+    private void SetLevelScaleClientRpc(Vector3 scale)
+    {
+        transform.localScale = scale;
+    }
+
+    public void SynchronizeElementConfiguration(
+        NetworkObject networkObject,
+        string elementKey,
+        string configurationJson)
+    {
+        if (!IsServer || networkObject == null || !networkObject.IsSpawned)
+        {
+            return;
+        }
+
+        ApplyElementConfigurationClientRpc(networkObject, elementKey, configurationJson);
+    }
+
+    [Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+    private void ApplyElementConfigurationClientRpc(
         NetworkObjectReference elementReference,
         string elementKey,
         string configurationJson)

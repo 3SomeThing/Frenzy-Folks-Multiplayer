@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Frenzy_Folks.Scripts.Core;
 using Unity.Netcode;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -136,16 +132,22 @@ public class FrenzyLevelConfiguration
         return this;
     }
 
-    public void AddToLevel<T>(ConfigurationEntry entry, GameObject prefab)
-    where T : BaseConfigurationSerializable
+    private void AddToLevel(ConfigurationEntry entry, GameObject prefab)
     {
         GameObject instance = Object.Instantiate(prefab, _parentLevel.transform, true);
-        ((T)entry.value).Apply(instance);
+        entry.value.Apply(instance);
 
         NetworkObject networkObject = instance.GetComponent<NetworkObject>();
+        if (networkObject == null)
+        {
+            Object.Destroy(instance);
+            throw new InvalidOperationException(
+                $"Prefab '{prefab.name}' for '{entry.key}' must contain a NetworkObject.");
+        }
+
         networkObject.Spawn(true);
         networkObject.TrySetParent(_parentLevel.transform);
-        _parentLevel.ApplyElementConfigurationRpc(
+        _parentLevel.SynchronizeElementConfiguration(
             networkObject,
             entry.key,
             JsonUtility.ToJson(entry.value));
@@ -155,16 +157,18 @@ public class FrenzyLevelConfiguration
     {
         JsonUtility.FromJsonOverwrite(json, this);
 
-        Debug.Log("Configuration entries count: " + configurationEntries.Count);
-        
-        Debug.Log("Level file name: " + GameState.Instance.LevelFileName.Value);
-        
         foreach (ConfigurationEntry configurationEntry in configurationEntries)
         {
-            AddToLevel<BaseConfigurationSerializable>(configurationEntry, _parentLevel.levelPrefabs[configurationEntry.key]);
+            if (!_parentLevel.levelPrefabs.TryGetValue(configurationEntry.key, out GameObject prefab))
+            {
+                Debug.LogError($"No prefab configured for level element '{configurationEntry.key}'.");
+                continue;
+            }
+
+            AddToLevel(configurationEntry, prefab);
         }
 
-        _parentLevel.transform.localScale *= 20;
+        _parentLevel.SetLoadedLevelScale(20f);
     }
 
     public static void ApplyToElement(
@@ -205,12 +209,16 @@ public class FrenzyLevelConfiguration
         return true;
     }
     
-    public static FrenzyLevelConfiguration Load(FrenzyLevel level, string levelName, Dictionary<string, GameObject> prefabs)
+    public static FrenzyLevelConfiguration Load(FrenzyLevel level, string levelName)
     {
-        Debug.Log("Loading level elements...");
-        string json = File.ReadAllText(Path.Combine(LevelsPath, levelName));
+        string path = Path.Combine(LevelsPath, levelName);
+        if (!File.Exists(path))
+        {
+            throw new FileNotFoundException($"Level configuration file '{path}' was not found.", path);
+        }
+
         FrenzyLevelConfiguration frenzyLevelConfiguration = new FrenzyLevelConfiguration(level);
-        frenzyLevelConfiguration.Load(json);
+        frenzyLevelConfiguration.Load(File.ReadAllText(path));
         return frenzyLevelConfiguration;
     }
 }

@@ -8,6 +8,8 @@ using UnityEngine;
 
 public class RespawnDetector : MonoBehaviour
 {
+    private const float DeathCooldown = 1f;
+
     public static RespawnDetector Instance { get; private set; }
     
     private readonly HashSet<NetworkPlayer> respawningPlayers = new();
@@ -87,6 +89,7 @@ public class RespawnDetector : MonoBehaviour
             NetworkAssetsManager.Instance.SetActiveForEveryone(character, true);
         }
 
+        yield return new WaitForSeconds(DeathCooldown);
         respawningPlayers.Remove(player);
     }
 }
