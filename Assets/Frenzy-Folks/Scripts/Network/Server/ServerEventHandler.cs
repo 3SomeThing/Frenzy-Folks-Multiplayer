@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 using Frenzy_Folks.Scripts.Core;
 using Frenzy_Folks.Scripts.Network;
@@ -88,6 +89,7 @@ public class ServerEventHandler : MonoBehaviour
         if (sceneName == "TestingPlayground" && loadSceneMode == LoadSceneMode.Single)
         {
             GameState.Instance.ResetCheckpoints(_networkManager.ConnectedClientsIds);
+            ResetCheckpointColors();
         }
 
         if (sceneName != "Lobby" || loadSceneMode != LoadSceneMode.Single)
@@ -126,6 +128,19 @@ public class ServerEventHandler : MonoBehaviour
                 client.PlayerObject.TryGetComponent(out NetworkPlayer player))
             {
                 player.AssignWorldCanvasCameraRpc();
+            }
+        }
+    }
+
+    private void ResetCheckpointColors()
+    {
+        foreach (NetworkClient client in _networkManager.ConnectedClientsList)
+        {
+            if (client.PlayerObject != null &&
+                client.PlayerObject.TryGetComponent(out NetworkPlayer player))
+            {
+                player.ResetCheckpointColorsRpc();
+                return;
             }
         }
     }
@@ -228,5 +243,44 @@ public class ServerEventHandler : MonoBehaviour
         _networkManager.OnClientDisconnectCallback -= OnClientDisconnect;
         // _networkManager.SceneManager.OnLoadEventCompleted -= OnSceneLoadedComplete;
         Destroy(this);
+    }
+    
+    public void DespawnAllPlayers()
+    {
+        if (!_networkManager.IsServer) return;
+
+        foreach (NetworkClient client in new List<NetworkClient>(_networkManager.ConnectedClientsList))
+        {
+            if (client.PlayerObject != null && client.PlayerObject.IsSpawned)
+            {
+                client.PlayerObject.Despawn(true); // true = destroy
+            }
+        }
+
+        _spawnedPlayers.Clear();
+    }
+
+    public void RespawnAllPlayers()
+    {
+        if (!_networkManager.IsServer) return;
+
+        foreach (ulong clientId in _networkManager.ConnectedClientsIds)
+        {
+            SpawnPlayer(clientId, GetPlayerName(clientId));
+        }
+
+        AssignWorldCanvasCameras();
+    }
+
+    public void DespawnAndRespawnAllPlayers()
+    {
+        StartCoroutine(DespawnRespawnRoutine());
+    }
+
+    private IEnumerator DespawnRespawnRoutine()
+    {
+        DespawnAllPlayers();
+        yield return null;
+        RespawnAllPlayers();
     }
 }

@@ -202,6 +202,22 @@ public class NetworkPlayer : NetworkBehaviour
         ResetForLobbyRpc();
     }
 
+    public void ResetCheckpointColorsRpc()
+    {
+        if (!IsServer)
+        {
+            return;
+        }
+
+        ResetCheckpointColorsClientRpc();
+    }
+
+    [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
+    private void ResetCheckpointColorsClientRpc()
+    {
+        Checkpoint.ResetColors();
+    }
+
     [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
     private void ResetForLobbyRpc()
     {
@@ -276,6 +292,35 @@ public class NetworkPlayer : NetworkBehaviour
 
         isRespawning.Value = respawning;
         ApplyRespawningState(respawning);
+    }
+
+    public void PlayRespawnEffects()
+    {
+        if (!IsServer)
+        {
+            return;
+        }
+
+        PlayRespawnEffectsRpc();
+    }
+
+    [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
+    private void PlayRespawnEffectsRpc()
+    {
+        Transform explosion = transform.Find("Explosion");
+        ParticleSystem explosionParticles =
+            explosion != null ? explosion.GetComponent<ParticleSystem>() : null;
+        if (explosionParticles != null)
+        {
+            explosionParticles.Play(true);
+        }
+
+        Transform death = transform.Find("Death");
+        AudioSource deathSound = death != null ? death.GetComponent<AudioSource>() : null;
+        if (deathSound != null)
+        {
+            deathSound.Play();
+        }
     }
 
     public void RespawnAt(Vector3 position, Quaternion rotation)

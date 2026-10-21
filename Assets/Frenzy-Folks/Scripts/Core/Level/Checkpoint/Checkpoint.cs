@@ -147,6 +147,19 @@ public class Checkpoint : NetworkBehaviour
         }
     }
 
+    public static void ResetColors()
+    {
+        localReachedCheckpointIndex = -1;
+
+        foreach (Checkpoint checkpoint in registeredCheckpoints)
+        {
+            if (checkpoint != null && checkpoint.cylinder != null && checkpoint.changeColor)
+            {
+                checkpoint.cylinder.SetPropertyBlock(null);
+            }
+        }
+    }
+    
     private void PlaySoundAndAnimation()
     {
         if (!playSoundAndAnimation) return;
