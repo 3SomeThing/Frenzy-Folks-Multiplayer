@@ -14,13 +14,18 @@ public class TrampolineTrap : MonoBehaviour
     private int playerLayer; //TODO: Generique partout
 
     private Spring spring;
-    private Vector3 initialScale;
+    /**
+     * TODO: Fix this, should be the original scale of the object,
+    // but it is not set correctly in Awake() because the object is scaled by the parent.
+    // We need to find a way to get the original scale of the object without being affected by the parent scale.
+     */
+    private Vector3 initialScale = Vector3.one * 9F;
     private bool isBumping;
     private bool isReturningToRest;
 
     private void Awake()
     {
-        initialScale = transform.localScale;
+        // initialScale = transform.localScale;
         spring = new Spring(
             config: SpringConfig.Create(tension: 600, friction: 12),
             from: 1f,

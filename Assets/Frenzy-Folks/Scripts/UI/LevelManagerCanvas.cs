@@ -86,7 +86,7 @@ public class LevelManagerCanvas : NetworkBehaviour
     {
         if (!IsServer) return;
         
-        Debug.Log("TestButton.OnButtonClick");
+        // Debug.Log("TestButton.OnButtonClick");
 
         NetworkObject playerObject = NetworkManager.Singleton.LocalClient?.PlayerObject;
         CursorToggler cursorToggler = playerObject != null

@@ -39,7 +39,7 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
             
             if(!other.CompareTag("Player"))
             {
-                if (other.CompareTag("Turret")) return;
+                if (other.CompareTag("Turret") || other.CompareTag("IgnoreProjectile")) return;
                 if (impactEffect != null)
                 {
                     Debug.Log($"[TurretProjectile] Playing impact effect '{impactEffect.name}' at position {transform.position}.");
@@ -74,6 +74,8 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
 
         private void Despawn()
         {
+            if (!IsServer) return;
+            
             if (IsSpawned)
                 NetworkObject.Despawn(true);
             else

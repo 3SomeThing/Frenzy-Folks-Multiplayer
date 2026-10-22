@@ -10,12 +10,17 @@ using UnityEngine.Events;
 [RequireComponent(typeof(NetworkObject))]
 public class StartPlatform : Checkpoint
 {
+    // Safety net: if the level never reports ready, don't leave the players locked forever.
+    private const float LevelReadyTimeoutSeconds = 30f;
+
     [SerializeField] private BoxCollider startZone;
     [SerializeField, Min(1f)] private float countdownDuration = 5f;
     [SerializeField] private string countdownCanvasName = "PlayerCanvas";
     [SerializeField] private string countdownTextName = "StartTimerText";
 
     private readonly List<NetworkPlayer> players = new();
+    private readonly HashSet<NetworkPlayer> placedPlayers = new();
+    private FrenzyLevel level;
     private bool countdownStarted;
     private bool gameStarted;
 
@@ -36,12 +41,22 @@ public class StartPlatform : Checkpoint
             startZone = GameObject.Find("StartZone")?.GetComponent<BoxCollider>();
         }
 
-        RefreshPlayers();
-        PositionPlayersInStartZone();
+        level = GetComponentInParent<FrenzyLevel>();
+        if (level == null)
+        {
+            level = FindObjectOfType<FrenzyLevel>();
+        }
+
+        // The platform spawns while the level is still being built and is scaled afterwards,
+        // so wait until the level is final before moving anybody onto it.
+        yield return WaitForLevelReady();
+
+        TeleportPlayersToStart();
 
         while (!gameStarted)
         {
             RefreshPlayers();
+            TeleportNewPlayersToStart(); // players who joined after the level was loaded
             LockPlayers(true);
 
             if (!countdownStarted && players.Count > 0 && AllPlayersAreInStartZone())
@@ -53,30 +68,99 @@ public class StartPlatform : Checkpoint
         }
     }
 
-    private void PositionPlayersInStartZone()
+    private IEnumerator WaitForLevelReady()
     {
-        if (startZone == null)
+        if (level == null)
+        {
+            yield break;
+        }
+
+        float deadline = Time.realtimeSinceStartup + LevelReadyTimeoutSeconds;
+        while (!level.IsLevelReady)
+        {
+            if (Time.realtimeSinceStartup > deadline)
+            {
+                Debug.LogWarning(
+                    "[StartScript] Level was not ready in time, teleporting players anyway.",
+                    this);
+                yield break;
+            }
+
+            // Keep players still while the level is being built.
+            RefreshPlayers();
+            LockPlayers(true);
+            yield return null;
+        }
+    }
+
+    /// <summary>
+    /// Teleports every connected player onto the start zone. Server only.
+    /// Called automatically once the level is ready; can also be called manually.
+    /// </summary>
+    public void TeleportPlayersToStart()
+    {
+        if (!IsServer)
         {
             return;
         }
 
-        Vector3 spawnPosition = startZone.transform.TransformPoint(startZone.center);
-        spawnPosition.y += 0.35f;
-        
-        Quaternion spawnRotation = startZone.transform.rotation;
+        if (!startZone)
+        {
+            Debug.LogError("[StartScript] A StartZone BoxCollider is required.", this);
+            return;
+        }
+
+        RefreshPlayers();
+        placedPlayers.Clear();
+
+        // Make sure the physics world knows about the final (scaled) transforms.
+        Physics.SyncTransforms();
 
         foreach (NetworkPlayer player in players)
         {
-            if (!player.IsInside(startZone))
-            {
-                player.RespawnAt(spawnPosition, spawnRotation);
-            }
+            TeleportPlayer(player);
         }
 
         if (players.Count > 0)
         {
             players[0].SetPlayerLayerCollisionIgnored(true);
         }
+    }
+
+    private void TeleportNewPlayersToStart()
+    {
+        if (!startZone)
+        {
+            return;
+        }
+
+        placedPlayers.RemoveWhere(player => !player);
+
+        foreach (NetworkPlayer player in players)
+        {
+            if (placedPlayers.Contains(player))
+            {
+                continue;
+            }
+
+            if (!player.IsInside(startZone))
+            {
+                TeleportPlayer(player);
+            }
+            else
+            {
+                placedPlayers.Add(player);
+            }
+        }
+    }
+
+    private void TeleportPlayer(NetworkPlayer player)
+    {
+        Vector3 spawnPosition = startZone.transform.TransformPoint(startZone.center);
+        spawnPosition.y += 0.35f;
+
+        player.RespawnAt(spawnPosition, startZone.transform.rotation);
+        placedPlayers.Add(player);
     }
 
     private void RefreshPlayers()
@@ -115,10 +199,10 @@ public class StartPlatform : Checkpoint
     {
         countdownStarted = true;
         GameState.Instance.LockJoining = true;
-        
+
         float remaining = countdownDuration;
         NetworkAssetsManager.Instance.SetActiveForEachPlayer(countdownTextName, true);
-        
+
         while (remaining > 0f)
         {
             RefreshPlayers();
@@ -135,7 +219,7 @@ public class StartPlatform : Checkpoint
             yield return new WaitForSeconds(1f);
             remaining -= 1f;
         }
-        
+
         gameStarted = true;
         LockPlayers(false);
         SendCountdownToClientsRpc(string.Empty);
@@ -154,7 +238,7 @@ public class StartPlatform : Checkpoint
     [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     private void SendCountdownToClientsRpc(string text)
     {
-        UpdateCountdownRpc(text); 
+        UpdateCountdownRpc(text);
     }
 
     [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
@@ -206,7 +290,7 @@ public class StartPlatform : Checkpoint
 
     private void OnTriggerExit(Collider other)
     {
-        Debug.Log("OnTriggerExit");
+        // Debug.Log("OnTriggerExit");
         if (!other.TryGetComponent(out NetworkPlayer player))
         {
             player = other.GetComponentInParent<NetworkPlayer>();

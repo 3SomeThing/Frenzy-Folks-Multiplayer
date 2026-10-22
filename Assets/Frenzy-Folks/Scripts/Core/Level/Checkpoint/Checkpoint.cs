@@ -6,9 +6,9 @@ using UnityEngine;
 
 public class Checkpoint : NetworkBehaviour
 {
-    private static int nextCheckpointIndex;
-    private static readonly Dictionary<int, Checkpoint> checkpoints =
-        new Dictionary<int, Checkpoint>();
+    // Every live checkpoint. Lookups scan this list using the *current* checkpointIndex, so they stay
+    // correct even when the index is changed after Awake (which is always the case for spawned
+    // checkpoints: Awake runs with the prefab's default index, the real one comes from the level config).
     private static readonly List<Checkpoint> registeredCheckpoints =
         new List<Checkpoint>();
     private static int localReachedCheckpointIndex = -1;
@@ -18,36 +18,29 @@ public class Checkpoint : NetworkBehaviour
     [SerializeField] private AudioSource checkpointSound;
     [SerializeField] private ParticleSystem checkpointParticules;
     [SerializeField] private SkinnedMeshRenderer cylinder;
-    
+
     [SerializeField] public bool playSoundAndAnimation = true;
     [SerializeField] public bool changeColor = true;
-    
+
     private MaterialPropertyBlock block;
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
-    
+
     private static readonly Color reachedColor = new(0.0f, 0.8f, 0.0f, 0.5f);
-        
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetIndex()
     {
-        nextCheckpointIndex = 0;
-        checkpoints.Clear();
         registeredCheckpoints.Clear();
         localReachedCheckpointIndex = -1;
     }
 
     private void Awake()
-    {        
+    {
         block = new MaterialPropertyBlock();
-        
+
         if (checkpointIndex < 0)
         {
-            while (checkpoints.ContainsKey(nextCheckpointIndex))
-            {
-                nextCheckpointIndex++;
-            }
-
-            checkpointIndex = nextCheckpointIndex;
+            checkpointIndex = GetNextFreeIndex();
         }
 
         RefreshRegistration();
@@ -55,16 +48,20 @@ public class Checkpoint : NetworkBehaviour
 
     private void OnDestroy()
     {
-        RemoveRegistrations();
+        registeredCheckpoints.Remove(this);
     }
 
+    /// <summary>
+    /// Registers this checkpoint (once) and refreshes its color. Call it after changing checkpointIndex.
+    /// </summary>
     public void RefreshRegistration()
     {
-        RemoveRegistrations();
+        registeredCheckpoints.RemoveAll(checkpoint => checkpoint == null);
 
-        nextCheckpointIndex = Mathf.Max(nextCheckpointIndex, checkpointIndex + 1);
-        checkpoints[checkpointIndex] = this;
-        registeredCheckpoints.Add(this);
+        if (!registeredCheckpoints.Contains(this))
+        {
+            registeredCheckpoints.Add(this);
+        }
 
         if (checkpointIndex <= localReachedCheckpointIndex)
         {
@@ -72,28 +69,30 @@ public class Checkpoint : NetworkBehaviour
         }
     }
 
-    private void RemoveRegistrations()
+    private static int GetNextFreeIndex()
     {
-        List<int> registrationsToRemove = new List<int>();
-        foreach (KeyValuePair<int, Checkpoint> registration in checkpoints)
+        int index = 0;
+        while (TryGetByIndex(index, out _))
         {
-            if (registration.Value == this)
-            {
-                registrationsToRemove.Add(registration.Key);
-            }
+            index++;
         }
 
-        foreach (int registration in registrationsToRemove)
-        {
-            checkpoints.Remove(registration);
-        }
-
-        registeredCheckpoints.Remove(this);
+        return index;
     }
 
     public static bool TryGetByIndex(int index, out Checkpoint checkpoint)
     {
-        return checkpoints.TryGetValue(index, out checkpoint);
+        foreach (Checkpoint candidate in registeredCheckpoints)
+        {
+            if (candidate != null && candidate.checkpointIndex == index)
+            {
+                checkpoint = candidate;
+                return true;
+            }
+        }
+
+        checkpoint = null;
+        return false;
     }
 
     public void OnTriggerEnter(Collider other)
@@ -126,8 +125,12 @@ public class Checkpoint : NetworkBehaviour
                 player.OwnerClientId,
                 checkpointIndex,
                 this);
-            PlaySoundAndAnimation();
-            player.ApplyCheckpointColorRpc(checkpointIndex);
+
+            // Only the player who touched the checkpoint gets the green color and the animation.
+            // Everybody else keeps seeing it as "not reached yet".
+            ShowCheckpointReachedRpc(
+                checkpointIndex,
+                RpcTarget.Single(player.OwnerClientId, RpcTargetUse.Temp));
         }
     }
 
@@ -153,26 +156,42 @@ public class Checkpoint : NetworkBehaviour
 
         foreach (Checkpoint checkpoint in registeredCheckpoints)
         {
-            if (checkpoint != null) continue;
-            
+            if (checkpoint == null) continue;
+
             if (!checkpoint.changeColor || !checkpoint.cylinder) continue;
-            
+
             checkpoint.cylinder.SetPropertyBlock(null);
         }
     }
-    
+
+    // Runs only on the client (or host) that owns the player who reached the checkpoint.
+    [Rpc(SendTo.SpecifiedInParams, InvokePermission = RpcInvokePermission.Server)]
+    private void ShowCheckpointReachedRpc(int reachedIndex, RpcParams rpcParams = default)
+    {
+        ApplyColorsUpTo(reachedIndex);
+        PlaySoundAndAnimation();
+    }
+
     private void PlaySoundAndAnimation()
     {
         if (!playSoundAndAnimation) return;
-        
-        NetworkAssetsManager.Instance.PlayForEveryone(checkpointSound);
-        NetworkAssetsManager.Instance.PlayForEveryone(checkpointParticules);
+
+        if (checkpointSound != null)
+        {
+            checkpointSound.Play();
+        }
+
+        if (checkpointParticules != null)
+        {
+            checkpointParticules.Play();
+        }
     }
-    
+
     public void SetColor()
     {
-        if (!changeColor) return;
-        
+        if (!changeColor || !cylinder) return;
+
+        block ??= new MaterialPropertyBlock();
         cylinder.GetPropertyBlock(block);
         block.SetColor(BaseColorId, reachedColor);
         cylinder.SetPropertyBlock(block);

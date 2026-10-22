@@ -12,6 +12,7 @@ TagManager:
   - Turret
   - Ball
   - Coin
+  - IgnoreProjectile
   layers:
   - Default
   - TransparentFX
