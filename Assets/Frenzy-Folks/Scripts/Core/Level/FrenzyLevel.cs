@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using Frenzy_Folks.Scripts.Core;
 using Unity.Netcode;
 using UnityEngine;
@@ -18,15 +17,18 @@ public class FrenzyLevel : NetworkBehaviour
     {
         public readonly string ElementKey;
         public readonly string ConfigurationJson;
+        public readonly int CheckpointIndex;
         public readonly HashSet<ulong> AwaitingClientIds;
 
         public PendingElementConfiguration(
             string elementKey,
             string configurationJson,
+            int checkpointIndex,
             IEnumerable<ulong> clientIds)
         {
             ElementKey = elementKey;
             ConfigurationJson = configurationJson;
+            CheckpointIndex = checkpointIndex;
             AwaitingClientIds = new HashSet<ulong>(clientIds);
         }
     }
@@ -74,7 +76,6 @@ public class FrenzyLevel : NetworkBehaviour
         InputActionType.Button,
         binding: "<Keyboard>/u");
 
-
     private void Awake()
     {
         _baseScale = transform.localScale;
@@ -88,7 +89,7 @@ public class FrenzyLevel : NetworkBehaviour
         ApplyLoadedScale(loadedScaleFactor.Value);
 
         levelReady.OnValueChanged += OnLevelReadyChanged;
-        UpdateLoadingCanvas(levelReady.Value);
+        ApplyLevelReadyState(levelReady.Value);
 
         if (!IsServer)
         {
@@ -232,6 +233,13 @@ public class FrenzyLevel : NetworkBehaviour
         loadedElements.Clear();
         pendingElementConfigurations.Clear();
 
+        // New level: forget which checkpoints the players reached on the previous one,
+        // otherwise their old (higher) indices would make every new checkpoint look "already passed".
+        if (GameState.Instance != null)
+        {
+            GameState.Instance.ResetCheckpoints(NetworkManager.ConnectedClientsIds);
+        }
+
         _loadGeneration++;
         SetLevelReady(false);
         _isLoading = true;
@@ -307,12 +315,23 @@ public class FrenzyLevel : NetworkBehaviour
         }
 
         levelReady.Value = ready;
-        UpdateLoadingCanvas(ready); // explicit, so the host never depends on callback timing
+        ApplyLevelReadyState(ready); // explicit, so the host never depends on callback timing
     }
 
     private void OnLevelReadyChanged(bool previous, bool current)
     {
-        UpdateLoadingCanvas(current);
+        ApplyLevelReadyState(current);
+    }
+
+    private void ApplyLevelReadyState(bool ready)
+    {
+        UpdateLoadingCanvas(ready);
+
+        if (!ready)
+        {
+            // A level is (re)loading: forget the checkpoint colors of the previous one on every peer.
+            Checkpoint.ResetColors();
+        }
     }
 
     private void UpdateLoadingCanvas(bool levelIsReady)
@@ -347,13 +366,14 @@ public class FrenzyLevel : NetworkBehaviour
             return;
         }
 
-        ApplyElementConfigurationClientRpc(networkObject, elementKey, configurationJson);
+        ApplyElementConfigurationClientRpc(networkObject, elementKey, configurationJson, -1);
     }
 
     public void RegisterSpawnedElement(
         NetworkObject networkObject,
         string elementKey,
-        string configurationJson)
+        string configurationJson,
+        int checkpointIndex = -1)
     {
         if (!IsServer || networkObject == null || !networkObject.IsSpawned)
         {
@@ -363,7 +383,7 @@ public class FrenzyLevel : NetworkBehaviour
         loadedElements.Add(networkObject);
 
         PendingElementConfiguration pendingConfiguration =
-            new(elementKey, configurationJson, NetworkManager.ConnectedClientsIds);
+            new(elementKey, configurationJson, checkpointIndex, NetworkManager.ConnectedClientsIds);
         pendingElementConfigurations[networkObject.NetworkObjectId] = pendingConfiguration;
 
         RequestElementSpawnHandshakeClientRpc(networkObject.NetworkObjectId);
@@ -471,7 +491,8 @@ public class FrenzyLevel : NetworkBehaviour
             ApplyElementConfigurationClientRpc(
                 networkObject,
                 pendingConfiguration.ElementKey,
-                pendingConfiguration.ConfigurationJson);
+                pendingConfiguration.ConfigurationJson,
+                pendingConfiguration.CheckpointIndex);
         }
         else
         {
@@ -506,7 +527,8 @@ public class FrenzyLevel : NetworkBehaviour
     private void ApplyElementConfigurationClientRpc(
         NetworkObjectReference elementReference,
         string elementKey,
-        string configurationJson)
+        string configurationJson,
+        int checkpointIndex)
     {
         if (!elementReference.TryGet(out NetworkObject networkObject))
         {
@@ -518,5 +540,8 @@ public class FrenzyLevel : NetworkBehaviour
             networkObject.gameObject,
             elementKey,
             configurationJson);
+
+        // The server's final checkpoint order always wins over whatever the JSON contained.
+        FrenzyLevelConfiguration.ApplyCheckpointIndex(networkObject.gameObject, checkpointIndex);
     }
 }

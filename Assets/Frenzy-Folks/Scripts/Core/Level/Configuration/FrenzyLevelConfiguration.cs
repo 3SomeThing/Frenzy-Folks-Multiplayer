@@ -15,6 +15,15 @@ public class FrenzyLevelConfiguration
     // Delay between two spawns, to avoid flooding the network with spawn messages in one frame.
     private const float SpawnIntervalSeconds = 0.05f;
 
+    // Checkpoints are compared with ">" so their indices MUST be unique and follow the course order.
+    // When true, indices are assigned from the order of the entries in the JSON file
+    // (start platform = 0, checkpoints = 1..N, end platform = N + 1) and the indices stored in the file are ignored.
+    private const bool RenumberCheckpointsByFileOrder = true;
+
+    private const string StartPlatformKey = "start_platform";
+    private const string CheckpointKey = "checkpoint";
+    private const string EndPlatformKey = "end_platform";
+
     private readonly FrenzyLevel _parentLevel;
 
     private static readonly Dictionary<string, Func<BaseConfigurationSerializable>> ConfigurationDefinitions = new()
@@ -137,10 +146,12 @@ public class FrenzyLevelConfiguration
         return this;
     }
 
-    private void AddToLevel(ConfigurationEntry entry, GameObject prefab)
+    private void AddToLevel(ConfigurationEntry entry, GameObject prefab, int checkpointIndex)
     {
         GameObject instance = Object.Instantiate(prefab, _parentLevel.transform, true);
         entry.value.Apply(instance);
+        ApplyCheckpointIndex(instance, checkpointIndex);
+        NotifyElementConfigured(instance);
 
         NetworkObject networkObject = instance.GetComponent<NetworkObject>();
         if (networkObject == null)
@@ -155,7 +166,8 @@ public class FrenzyLevelConfiguration
         _parentLevel.RegisterSpawnedElement(
             networkObject,
             entry.key,
-            JsonUtility.ToJson(entry.value));
+            JsonUtility.ToJson(entry.value),
+            checkpointIndex);
     }
 
     public void Load(string json)
@@ -167,8 +179,68 @@ public class FrenzyLevelConfiguration
         _parentLevel.StartCoroutine(SpawnAllElements());
     }
 
+    // Final checkpoint index for every entry (-1 = not a checkpoint / keep whatever the file says).
+    private int[] BuildCheckpointIndices()
+    {
+        int[] indices = new int[configurationEntries.Count];
+        for (int i = 0; i < indices.Length; i++)
+        {
+            indices[i] = -1;
+        }
+
+        if (!RenumberCheckpointsByFileOrder)
+        {
+            return indices;
+        }
+
+        int next = 1;
+        for (int i = 0; i < indices.Length; i++)
+        {
+            if (configurationEntries[i].key == CheckpointKey)
+            {
+                indices[i] = next++;
+            }
+        }
+
+        for (int i = 0; i < indices.Length; i++)
+        {
+            string key = configurationEntries[i].key;
+            if (key == StartPlatformKey)
+            {
+                indices[i] = 0;
+            }
+            else if (key == EndPlatformKey)
+            {
+                indices[i] = next;
+            }
+        }
+
+        Debug.Log(
+            $"Checkpoint indices assigned from file order: start = 0, checkpoints = 1..{next - 1}, end = {next}.");
+        return indices;
+    }
+
+    public static void ApplyCheckpointIndex(GameObject target, int checkpointIndex)
+    {
+        if (checkpointIndex < 0)
+        {
+            return;
+        }
+
+        Checkpoint checkpoint = target.GetComponentInChildren<Checkpoint>(true);
+        if (checkpoint == null)
+        {
+            return;
+        }
+
+        checkpoint.checkpointIndex = checkpointIndex;
+        checkpoint.RefreshRegistration();
+    }
+
     private IEnumerator SpawnAllElements()
     {
+        int[] checkpointIndices = BuildCheckpointIndices();
+
         for (int i = 0; i < configurationEntries.Count; i++)
         {
             ConfigurationEntry entry = configurationEntries[i];
@@ -181,7 +253,7 @@ public class FrenzyLevelConfiguration
 
             try
             {
-                AddToLevel(entry, prefab);
+                AddToLevel(entry, prefab, checkpointIndices[i]);
             }
             catch (Exception exception)
             {
@@ -195,6 +267,17 @@ public class FrenzyLevelConfiguration
         // Scale only once everything is spawned. The level waits for every client to confirm
         // each element's configuration before the scale is actually applied.
         _parentLevel.EndLevelLoad(LoadedLevelScale);
+    }
+
+    // Some elements keep static registries keyed by values that only exist once the configuration
+    // has been applied (e.g. the checkpoint index). Tell them to re-register, on the server and on clients.
+    private static void NotifyElementConfigured(GameObject target)
+    {
+        Checkpoint checkpoint = target.GetComponentInChildren<Checkpoint>(true);
+        if (checkpoint != null)
+        {
+            checkpoint.RefreshRegistration();
+        }
     }
 
     public static void ApplyToElement(
@@ -214,6 +297,7 @@ public class FrenzyLevelConfiguration
         JsonUtility.FromJsonOverwrite(configurationJson, configuration);
 
         configuration.Apply(target);
+        NotifyElementConfigured(target);
     }
 
     public static bool TryGetConfigurationJson(
