@@ -38,21 +38,17 @@ public class Platform : NetworkBehaviour
         _rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
     }
 
-    public override void OnNetworkSpawn()
-    {
-        _initialPosition = transform.position;
-        _initialRotation = transform.rotation;
-    }
-
     public void OnTriggerEnter(Collider other)
     {
         if ((other.CompareTag("Player") && !HasAuthority) ||
             (isPlatformFallingTriggered) ||
-            (!makePlatformFall))
+            (!makePlatformFall) || !other.CompareTag("Player"))
         {
             return;
         }
 
+        _initialPosition = transform.position;
+        _initialRotation = transform.rotation;
         isPlatformFallingTriggered = true;
         StartCoroutine(FallAfterDelay());
     }

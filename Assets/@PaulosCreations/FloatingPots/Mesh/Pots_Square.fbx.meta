@@ -1,58 +1,131 @@
 fileFormatVersion: 2
 guid: 94334e0a2c2838a40af65ce4378d20a6
-timeCreated: 1577185539
-licenseType: Store
+AssetOrigin:
+  serializedVersion: 1
+  productId: 141013
+  packageName: FloatingPlantPots
+  packageVersion: 2.0
+  assetPath: Assets/@PaulosCreations/FloatingPots/Mesh/Pots_Square.fbx
+  uploadId: 344820
 ModelImporter:
-  serializedVersion: 21
-  fileIDToRecycleName:
-    100000: LanternSq
-    100002: LanternTopSq
-    100004: PotBigRect
-    100006: PotBigSq
-    100008: PotDeepSmallSq
-    100010: //RootNode
-    100012: PotSmallRect
-    400000: LanternSq
-    400002: LanternTopSq
-    400004: PotBigRect
-    400006: PotBigSq
-    400008: PotDeepSmallSq
-    400010: //RootNode
-    400012: PotSmallRect
-    2300000: LanternSq
-    2300002: LanternTopSq
-    2300004: PotBigRect
-    2300006: PotBigSq
-    2300008: PotDeepSmallSq
-    2300010: PotSmallRect
-    3300000: LanternSq
-    3300002: LanternTopSq
-    3300004: PotBigRect
-    3300006: PotBigSq
-    3300008: PotDeepSmallSq
-    3300010: PotSmallRect
-    4300000: PotBigRect
-    4300002: PotBigSq
-    4300004: LanternSq
-    4300006: PotSmallRect
-    4300008: PotDeepSmallSq
-    4300010: LanternTopSq
+  serializedVersion: 24600
+  internalIDToNameTable:
+  - first:
+      1: 100000
+    second: LanternSq
+  - first:
+      1: 100002
+    second: LanternTopSq
+  - first:
+      1: 100004
+    second: PotBigRect
+  - first:
+      1: 100006
+    second: PotBigSq
+  - first:
+      1: 100008
+    second: PotDeepSmallSq
+  - first:
+      1: 100010
+    second: //RootNode
+  - first:
+      1: 100012
+    second: PotSmallRect
+  - first:
+      4: 400000
+    second: LanternSq
+  - first:
+      4: 400002
+    second: LanternTopSq
+  - first:
+      4: 400004
+    second: PotBigRect
+  - first:
+      4: 400006
+    second: PotBigSq
+  - first:
+      4: 400008
+    second: PotDeepSmallSq
+  - first:
+      4: 400010
+    second: //RootNode
+  - first:
+      4: 400012
+    second: PotSmallRect
+  - first:
+      23: 2300000
+    second: LanternSq
+  - first:
+      23: 2300002
+    second: LanternTopSq
+  - first:
+      23: 2300004
+    second: PotBigRect
+  - first:
+      23: 2300006
+    second: PotBigSq
+  - first:
+      23: 2300008
+    second: PotDeepSmallSq
+  - first:
+      23: 2300010
+    second: PotSmallRect
+  - first:
+      33: 3300000
+    second: LanternSq
+  - first:
+      33: 3300002
+    second: LanternTopSq
+  - first:
+      33: 3300004
+    second: PotBigRect
+  - first:
+      33: 3300006
+    second: PotBigSq
+  - first:
+      33: 3300008
+    second: PotDeepSmallSq
+  - first:
+      33: 3300010
+    second: PotSmallRect
+  - first:
+      43: 4300000
+    second: PotBigRect
+  - first:
+      43: 4300002
+    second: PotBigSq
+  - first:
+      43: 4300004
+    second: LanternSq
+  - first:
+      43: 4300006
+    second: PotSmallRect
+  - first:
+      43: 4300008
+    second: PotDeepSmallSq
+  - first:
+      43: 4300010
+    second: LanternTopSq
+  externalObjects: {}
   materials:
-    importMaterials: 1
+    materialImportMode: 1
     materialName: 1
     materialSearch: 0
+    materialLocation: 1
+    searchTexturesGlobally: 1
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
     resampleCurves: 1
     optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
     motionNodeName: 
-    rigImportErrors: 
-    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
     animationCompression: 1
     animationRotationError: 0.5
     animationPositionError: 0.5
@@ -67,30 +140,57 @@ ModelImporter:
     globalScale: 1
     meshCompression: 0
     addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    preBakeConvexCollisionMesh: 1
+    preBakeTriangleCollisionMesh: 0
+    importPhysicalCameras: 0
     importVisibility: 0
     importBlendShapes: 1
     importCameras: 0
     importLights: 0
+    nodeNameCollisionStrategy: 0
+    fileIdsGeneration: 1
     swapUVChannels: 0
     generateSecondaryUV: 1
     useFileUnits: 1
-    optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
+    importUVs: -1
+    importVertexColors: 1
+    meshOptimizationFlags: -1
+    indexFormat: 1
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 0
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
     secondaryUVPackMargin: 4
     useFileScale: 1
+    strictVertexDataChecks: 0
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
     tangentImportMode: 3
     normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 1
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+    calculateBlendshapeNormalsDeltaFromImportedNormals: 1
+  referencedClips: []
   importAnimation: 1
-  copyAvatar: 0
   humanDescription:
-    serializedVersion: 2
+    serializedVersion: 3
     human: []
     skeleton: []
     armTwist: 0.5
@@ -100,22 +200,20 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
+    globalScale: 1
     rootMotionBoneName: 
-    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
     hasTranslationDoF: 0
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 0
   humanoidOversampling: 1
+  avatarSetup: 0
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 0
+  importBlendShapeDeformPercent: 0
+  remapMaterialsIfMaterialImportModeIsNone: 1
   additionalBone: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 141013
-  packageName: FloatingPlantPots
-  packageVersion: 2.0
-  assetPath: Assets/@PaulosCreations/FloatingPots/Mesh/Pots_Square.fbx
-  uploadId: 344820

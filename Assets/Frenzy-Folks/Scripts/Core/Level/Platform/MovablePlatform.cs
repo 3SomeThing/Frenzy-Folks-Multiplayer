@@ -20,6 +20,7 @@ public class MovablePlatform : NetworkBehaviour
     public Vector3 Velocity { get; private set; }
 
     [SerializeField] private List<Vector3> pathPoints = new();
+    private readonly List<Vector3> _localPathPoints = new();
     private int _currentPathIndex;
     private float _pauseTimer;
 
@@ -41,11 +42,33 @@ public class MovablePlatform : NetworkBehaviour
     public void SetPathPoints(List<Vector3> points)
     {
         pathPoints.Clear();
-        pathPoints.AddRange(points);
+        _localPathPoints.Clear();
+
+        Transform levelTransform = transform.parent;
+        foreach (Vector3 point in points)
+        {
+            pathPoints.Add(point);
+            _localPathPoints.Add(levelTransform != null
+                ? levelTransform.InverseTransformPoint(point)
+                : point);
+        }
         _currentPathIndex = 0;
         _pauseTimer = 0f;
         _smoothVelocity = Vector3.zero;
         _needsInitialSnap = true;
+    }
+
+    private Vector3 GetWorldPathPoint(int index)
+    {
+        if (_localPathPoints.Count != pathPoints.Count)
+        {
+            return pathPoints[index];
+        }
+
+        Transform levelTransform = transform.parent;
+        return levelTransform != null
+            ? levelTransform.TransformPoint(_localPathPoints[index])
+            : _localPathPoints[index];
     }
 
     public List<Vector3> GetPathPoints()
@@ -73,7 +96,7 @@ public class MovablePlatform : NetworkBehaviour
         {
             _needsInitialSnap = false;
 
-            Vector3 start = pathPoints[0];
+            Vector3 start = GetWorldPathPoint(0);
             transform.position = start;
             _body.position = start;
 
@@ -93,7 +116,7 @@ public class MovablePlatform : NetworkBehaviour
         }
 
         Vector3 current = _body.position;
-        Vector3 target = pathPoints[_currentPathIndex];
+        Vector3 target = GetWorldPathPoint(_currentPathIndex);
 
         Vector3 next = smoothMovement
             ? Vector3.SmoothDamp(

@@ -605,7 +605,7 @@
                             "z": 1.0
                         }
                     },
-                    "makePlatformFall": false,
+                    "makePlatformFall": true,
                     "delayBeforeFalling": 2.0,
                     "delayBeforeRespawning": 3.0
                 }
@@ -637,7 +637,7 @@
                             "z": 1.0
                         }
                     },
-                    "makePlatformFall": false,
+                    "makePlatformFall": true,
                     "delayBeforeFalling": 2.0,
                     "delayBeforeRespawning": 3.0
                 }
@@ -669,7 +669,7 @@
                             "z": 1.0
                         }
                     },
-                    "makePlatformFall": false,
+                    "makePlatformFall": true,
                     "delayBeforeFalling": 2.0,
                     "delayBeforeRespawning": 3.0
                 }
@@ -734,7 +734,7 @@
                             "z": 2.1797256469726563
                         }
                     },
-                    "makePlatformFall": false,
+                    "makePlatformFall": true,
                     "delayBeforeFalling": 2.0,
                     "delayBeforeRespawning": 3.0
                 }
@@ -766,7 +766,7 @@
                             "z": 2.1971938610076904
                         }
                     },
-                    "makePlatformFall": false,
+                    "makePlatformFall": true,
                     "delayBeforeFalling": 2.0,
                     "delayBeforeRespawning": 3.0
                 }
@@ -798,7 +798,7 @@
                             "z": 2.059636116027832
                         }
                     },
-                    "makePlatformFall": false,
+                    "makePlatformFall": true,
                     "delayBeforeFalling": 2.0,
                     "delayBeforeRespawning": 3.0
                 }
@@ -830,7 +830,7 @@
                             "z": 1.830045461654663
                         }
                     },
-                    "makePlatformFall": false,
+                    "makePlatformFall": true,
                     "delayBeforeFalling": 2.0,
                     "delayBeforeRespawning": 3.0
                 }
@@ -862,7 +862,7 @@
                             "z": 1.308192253112793
                         }
                     },
-                    "makePlatformFall": false,
+                    "makePlatformFall": true,
                     "delayBeforeFalling": 2.0,
                     "delayBeforeRespawning": 3.0
                 }
@@ -895,7 +895,18 @@
                         }
                     },
                     "speed": 5.0,
-                    "pathPoints": []
+                    "pathPoints": [
+                        {
+                            "x": 3.487581491470337,
+                            "y": 3.3077614307403564,
+                            "z": -10.082358360290527
+                        },
+                        {
+                            "x": 3.487581491470337,
+                            "y": 3.3077614307403564,
+                            "z": -9.082358360290527
+                        }
+                    ]
                 }
             },
             {
@@ -987,7 +998,7 @@
                             "z": 1.7213363647460938
                         }
                     },
-                    "makePlatformFall": false,
+                    "makePlatformFall": true,
                     "delayBeforeFalling": 2.0,
                     "delayBeforeRespawning": 3.0
                 }
@@ -1019,7 +1030,7 @@
                             "z": 1.3960446119308472
                         }
                     },
-                    "makePlatformFall": false,
+                    "makePlatformFall": true,
                     "delayBeforeFalling": 2.0,
                     "delayBeforeRespawning": 3.0
                 }
@@ -1051,7 +1062,7 @@
                             "z": 1.0
                         }
                     },
-                    "makePlatformFall": false,
+                    "makePlatformFall": true,
                     "delayBeforeFalling": 2.0,
                     "delayBeforeRespawning": 3.0
                 }
@@ -1083,7 +1094,7 @@
                             "z": 1.0
                         }
                     },
-                    "makePlatformFall": false,
+                    "makePlatformFall": true,
                     "delayBeforeFalling": 2.0,
                     "delayBeforeRespawning": 3.0
                 }
@@ -1115,7 +1126,7 @@
                             "z": 1.0
                         }
                     },
-                    "makePlatformFall": false,
+                    "makePlatformFall": true,
                     "delayBeforeFalling": 2.0,
                     "delayBeforeRespawning": 3.0
                 }
@@ -1147,7 +1158,7 @@
                             "z": 1.0
                         }
                     },
-                    "makePlatformFall": false,
+                    "makePlatformFall": true,
                     "delayBeforeFalling": 2.0,
                     "delayBeforeRespawning": 3.0
                 }
@@ -1179,7 +1190,7 @@
                             "z": 1.0
                         }
                     },
-                    "makePlatformFall": false,
+                    "makePlatformFall": true,
                     "delayBeforeFalling": 2.0,
                     "delayBeforeRespawning": 3.0
                 }
