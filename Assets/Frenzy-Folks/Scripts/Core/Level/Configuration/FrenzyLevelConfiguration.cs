@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Unity.Netcode;
@@ -8,6 +9,12 @@ using Object = UnityEngine.Object;
 [Serializable]
 public class FrenzyLevelConfiguration
 {
+    // The JSON levels are authored at 1/20 of their final size.
+    private const float LoadedLevelScale = 20f;
+
+    // Delay between two spawns, to avoid flooding the network with spawn messages in one frame.
+    private const float SpawnIntervalSeconds = 0.05f;
+
     private readonly FrenzyLevel _parentLevel;
 
     private static readonly Dictionary<string, Func<BaseConfigurationSerializable>> ConfigurationDefinitions = new()
@@ -69,7 +76,7 @@ public class FrenzyLevelConfiguration
             () => new BuildingConfiguration()
         }
     };
-    
+
     public static readonly string LevelsPath = Path.Combine(Application.streamingAssetsPath, "Levels");
 
     [SerializeField]
@@ -78,32 +85,30 @@ public class FrenzyLevelConfiguration
     public FrenzyLevelConfiguration(FrenzyLevel parentLevel)
     {
         _parentLevel = parentLevel;
-        
-        if(!Directory.Exists(LevelsPath))
+
+        if (!Directory.Exists(LevelsPath))
         {
             Directory.CreateDirectory(LevelsPath);
         }
     }
-    
-    // private Dictionary<string, BaseConfigurationSerializable> configurations;
 
     public FrenzyLevelConfiguration SaveLevelToFile(string levelName = "test-level.json")
     {
         configurationEntries.Clear();
-        
+
         Debug.Log("Saving level elements...");
         Debug.Log("Prefabs count: " + _parentLevel.levelPrefabs.Count);
-        
+
         List<GameObject> serializedElements = new List<GameObject>();
-            
+
         foreach (SerializedLevelElement levelElement in _parentLevel.transform.GetComponentsInChildren<SerializedLevelElement>())
         {
             if (!levelElement.gameObject || serializedElements.Contains(levelElement.gameObject)) continue;
-                
+
             serializedElements.Add(levelElement.gameObject);
-                
+
             Debug.Log(levelElement.name);
-                
+
             // Get the key for the current prefab
             bool exists = ConfigurationDefinitions.TryGetValue(levelElement.elementName, out Func<BaseConfigurationSerializable> value);
 
@@ -147,7 +152,7 @@ public class FrenzyLevelConfiguration
 
         networkObject.Spawn(true);
         networkObject.TrySetParent(_parentLevel.transform);
-        _parentLevel.SynchronizeElementConfiguration(
+        _parentLevel.RegisterSpawnedElement(
             networkObject,
             entry.key,
             JsonUtility.ToJson(entry.value));
@@ -157,18 +162,39 @@ public class FrenzyLevelConfiguration
     {
         JsonUtility.FromJsonOverwrite(json, this);
 
-        foreach (ConfigurationEntry configurationEntry in configurationEntries)
+        // Resets the previous level and puts the level back at its authored scale.
+        _parentLevel.BeginLevelLoad();
+        _parentLevel.StartCoroutine(SpawnAllElements());
+    }
+
+    private IEnumerator SpawnAllElements()
+    {
+        for (int i = 0; i < configurationEntries.Count; i++)
         {
-            if (!_parentLevel.levelPrefabs.TryGetValue(configurationEntry.key, out GameObject prefab))
+            ConfigurationEntry entry = configurationEntries[i];
+
+            if (!_parentLevel.levelPrefabs.TryGetValue(entry.key, out GameObject prefab))
             {
-                Debug.LogError($"No prefab configured for level element '{configurationEntry.key}'.");
+                Debug.LogError($"No prefab configured for level element '{entry.key}'.");
                 continue;
             }
 
-            AddToLevel(configurationEntry, prefab);
+            try
+            {
+                AddToLevel(entry, prefab);
+            }
+            catch (Exception exception)
+            {
+                // One broken element must not prevent the rest of the level (and the final scale) from loading.
+                Debug.LogException(exception, _parentLevel);
+            }
+
+            yield return new WaitForSeconds(SpawnIntervalSeconds);
         }
 
-        _parentLevel.SetLoadedLevelScale(20f);
+        // Scale only once everything is spawned. The level waits for every client to confirm
+        // each element's configuration before the scale is actually applied.
+        _parentLevel.EndLevelLoad(LoadedLevelScale);
     }
 
     public static void ApplyToElement(
@@ -208,7 +234,7 @@ public class FrenzyLevelConfiguration
         configurationJson = JsonUtility.ToJson(configuration);
         return true;
     }
-    
+
     public static FrenzyLevelConfiguration Load(FrenzyLevel level, string levelName)
     {
         string path = Path.Combine(LevelsPath, levelName);

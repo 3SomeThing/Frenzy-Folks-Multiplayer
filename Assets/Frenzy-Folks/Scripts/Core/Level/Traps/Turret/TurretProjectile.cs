@@ -74,6 +74,8 @@ namespace Frenzy_Folks.Scripts.Traps.Turret
 
         private void Despawn()
         {
+            if (!IsServer) return;
+            
             if (IsSpawned)
                 NetworkObject.Despawn(true);
             else
